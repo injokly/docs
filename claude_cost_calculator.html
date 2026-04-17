@@ -5,588 +5,564 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Claude 기업 도입 비용 산정기</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
-  .app { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
-  h1 { font-size: 24px; font-weight: 800; color: #f8fafc; margin-bottom: 6px; }
-  .subtitle { font-size: 13px; color: #64748b; margin-bottom: 32px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+.app { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
+h1 { font-size: 24px; font-weight: 800; color: #f8fafc; margin-bottom: 6px; }
+.subtitle { font-size: 13px; color: #64748b; margin-bottom: 32px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.tab { padding: 9px 20px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+.tab.active { background: #6366f1; border-color: #6366f1; color: #fff; }
+.tab:hover:not(.active) { border-color: #6366f1; color: #a5b4fc; }
+.panel { display: none; }
+.panel.active { display: block; }
+.card { background: #1e2535; border: 1px solid #2d3748; border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+.card-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 18px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr 1fr; } }
 
-  .tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-  .tab { padding: 9px 20px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
-  .tab.active { background: #6366f1; border-color: #6366f1; color: #fff; }
-  .tab:hover:not(.active) { border-color: #6366f1; color: #a5b4fc; }
+/* Field label + tooltip */
+.fl { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+.tw { position: relative; display: inline-block; }
+.ib { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #334155; color: #94a3b8; font-size: 10px; font-weight: 700; cursor: default; border: none; flex-shrink: 0; transition: background 0.2s; }
+.tw:hover .ib { background: #6366f1; color: #fff; }
+.tb {
+  display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: #1e2535; border: 1px solid #4f46e5; border-radius: 10px;
+  padding: 12px 14px; width: 260px; font-size: 12px; color: #cbd5e1;
+  line-height: 1.6; z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+  pointer-events: none; text-align: left;
+}
+.tb::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:#4f46e5; }
+.tw:hover .tb { display: block; }
+.tb b { color: #a5b4fc; display: block; margin-bottom: 6px; }
+.tr { display:flex; justify-content:space-between; gap:8px; margin-top:3px; font-size:11px; }
+.tl { color:#64748b; }
+.tv { color:#10b981; font-weight:600; }
 
-  .panel { display: none; }
-  .panel.active { display: block; }
+input[type=number], select { width:100%; padding:10px 12px; background:#0f1117; border:1px solid #334155; border-radius:8px; color:#e2e8f0; font-size:14px; outline:none; transition:border-color 0.2s; -moz-appearance:textfield; }
+input[type=number]:focus, select:focus { border-color:#6366f1; }
+select option { background:#1e2535; }
 
-  .card { background: #1e2535; border: 1px solid #2d3748; border-radius: 14px; padding: 22px; margin-bottom: 18px; }
-  .card-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 18px; }
+.sc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+@media (max-width:600px) { .sc-grid { grid-template-columns:1fr 1fr; } }
+.sc { border:1px solid #334155; border-radius:10px; padding:14px; cursor:pointer; transition:all 0.2s; background:#0f1117; }
+.sc:hover { border-color:#6366f1; }
+.sc.active { border-color:#6366f1; background:#1a1a3f; }
+.sc .t { font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:4px; }
+.sc .d { font-size:11px; color:#64748b; line-height:1.4; }
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  @media (max-width: 640px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; } }
+.int-row { display:flex; gap:10px; flex-wrap:wrap; }
+.int-btn { flex:1; min-width:110px; padding:10px 12px; border-radius:10px; border:1px solid #334155; background:#0f1117; color:#94a3b8; cursor:pointer; font-size:13px; font-weight:600; transition:all 0.2s; text-align:center; }
+.int-btn:hover { border-color:#6366f1; }
+.int-btn.active { border-color:#6366f1; background:#1a1a3f; color:#818cf8; }
+.int-btn small { font-size:10px; font-weight:400; color:#475569; display:block; margin-top:3px; }
+.int-desc { background:#0f1a2e; border:1px solid #1e3a5f; border-radius:8px; padding:11px 14px; font-size:12px; color:#94a3b8; margin-top:12px; line-height:1.7; }
+.int-desc strong { color:#93c5fd; }
 
-  label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
-  input[type=number], select { width: 100%; padding: 10px 12px; background: #0f1117; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 14px; outline: none; transition: border-color 0.2s; -moz-appearance: textfield; }
-  input[type=number]:focus, select:focus { border-color: #6366f1; }
-  select option { background: #1e2535; }
+.pills { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+.pill { padding:7px 16px; border-radius:20px; border:1px solid #334155; cursor:pointer; font-size:13px; font-weight:500; transition:all 0.2s; color:#64748b; }
+.ph.s  { background:#052e16; border-color:#10b981; color:#6ee7b7; }
+.ps.s  { background:#0c1e3f; border-color:#3b82f6; color:#93c5fd; }
+.po.s  { background:#2d1b4e; border-color:#8b5cf6; color:#c4b5fd; }
 
-  .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 4px; }
-  @media (max-width: 600px) { .scenario-grid { grid-template-columns: 1fr 1fr; } }
-  .sc-card { border: 1px solid #334155; border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s; background: #0f1117; }
-  .sc-card:hover { border-color: #6366f1; }
-  .sc-card.active { border-color: #6366f1; background: #1a1a3f; }
-  .sc-card .sc-title { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 4px; }
-  .sc-card .sc-desc { font-size: 11px; color: #64748b; line-height: 1.4; }
+.hero { background:linear-gradient(135deg,#1a1f3e,#1e2535); border:1px solid #3730a3; border-radius:14px; padding:24px; margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:500px) { .hero { grid-template-columns:1fr; } }
+.hl { font-size:12px; color:#94a3b8; margin-bottom:6px; }
+.hv { font-size:32px; font-weight:800; color:#818cf8; }
+.hs { font-size:13px; color:#64748b; margin-top:4px; }
 
-  .model-pills { display: flex; gap: 10px; flex-wrap: wrap; }
-  .model-pill { padding: 7px 16px; border-radius: 20px; border: 1px solid #334155; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; color: #64748b; }
-  .pill-haiku.sel  { background: #052e16; border-color: #10b981; color: #6ee7b7; }
-  .pill-sonnet.sel { background: #0c1e3f; border-color: #3b82f6; color: #93c5fd; }
-  .pill-opus.sel   { background: #2d1b4e; border-color: #8b5cf6; color: #c4b5fd; }
+.srow { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+@media (max-width:600px) { .srow { grid-template-columns:1fr 1fr; } }
+.sb { background:#1e2535; border:1px solid #2d3748; border-radius:10px; padding:14px; }
+.sl { font-size:11px; color:#64748b; margin-bottom:8px; }
+.sv { font-size:20px; font-weight:700; color:#e2e8f0; }
+.su { font-size:11px; color:#94a3b8; font-weight:400; margin-left:2px; }
 
-  .result-hero { background: linear-gradient(135deg, #1a1f3e, #1e2535); border: 1px solid #3730a3; border-radius: 14px; padding: 24px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 500px) { .result-hero { grid-template-columns: 1fr; } }
-  .result-hero .rh-label { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
-  .result-hero .rh-value { font-size: 32px; font-weight: 800; color: #818cf8; }
-  .result-hero .rh-sub { font-size: 13px; color: #64748b; margin-top: 4px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; padding:8px 12px; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; border-bottom:1px solid #2d3748; }
+td { padding:10px 12px; border-bottom:1px solid #1a2030; color:#cbd5e1; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#1a2030; }
+.ttr td { font-weight:700; color:#818cf8; border-top:1px solid #334155; }
 
-  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
-  @media (max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; } }
-  .stat-box { background: #1e2535; border: 1px solid #2d3748; border-radius: 10px; padding: 14px; }
-  .stat-label { font-size: 11px; color: #64748b; margin-bottom: 8px; }
-  .stat-value { font-size: 20px; font-weight: 700; color: #e2e8f0; }
-  .stat-unit { font-size: 11px; color: #94a3b8; font-weight: 400; margin-left: 2px; }
+.badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; }
+.bg { background:#052e16; color:#6ee7b7; border:1px solid #065f46; }
+.bb { background:#0c1e3f; color:#93c5fd; border:1px solid #1e40af; }
+.bp { background:#2d1b4e; color:#c4b5fd; border:1px solid #5b21b6; }
+.br { background:#3b0a0a; color:#fca5a5; border:1px solid #7f1d1d; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 8px 12px; color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; border-bottom: 1px solid #2d3748; }
-  td { padding: 10px 12px; border-bottom: 1px solid #1a2030; color: #cbd5e1; vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #1a2030; }
-  .total-row td { font-weight: 700; color: #818cf8; border-top: 1px solid #334155; }
+.tip { background:#0f1a2e; border-left:3px solid #6366f1; border-radius:0 8px 8px 0; padding:12px 16px; font-size:12px; color:#94a3b8; margin-top:14px; line-height:1.6; }
+.tip strong { color:#a5b4fc; }
+.tip a { color:#818cf8; }
 
-  .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-  .badge-green  { background: #052e16; color: #6ee7b7; border: 1px solid #065f46; }
-  .badge-blue   { background: #0c1e3f; color: #93c5fd; border: 1px solid #1e40af; }
-  .badge-purple { background: #2d1b4e; color: #c4b5fd; border: 1px solid #5b21b6; }
-  .badge-red    { background: #3b0a0a; color: #fca5a5; border: 1px solid #7f1d1d; }
+.bc { display:flex; flex-direction:column; gap:10px; }
+.br2 { display:grid; grid-template-columns:130px 1fr 160px; gap:12px; align-items:center; }
+.blb { font-size:12px; color:#94a3b8; text-align:right; line-height:1.3; }
+.bt { background:#0f1117; border-radius:5px; height:20px; overflow:hidden; }
+.bf { height:100%; border-radius:5px; transition:width 0.5s ease; }
+.bv { font-size:12px; font-weight:700; color:#e2e8f0; }
 
-  .tip { background: #0f1a2e; border-left: 3px solid #6366f1; border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 12px; color: #94a3b8; margin-top: 14px; line-height: 1.6; }
-  .tip strong { color: #a5b4fc; }
-  .tip a { color: #818cf8; }
+.hlg { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+@media (max-width:500px) { .hlg { grid-template-columns:1fr 1fr; } }
+.hlb { background:#0d1f2d; border:1px solid #1e3a5f; border-radius:10px; padding:16px; }
+.hll { font-size:11px; color:#60a5fa; margin-bottom:6px; }
+.hlv { font-size:20px; font-weight:700; color:#93c5fd; }
+.hls { font-size:11px; color:#475569; margin-top:3px; }
 
-  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
-  .bar-row { display: grid; grid-template-columns: 110px 1fr 90px; gap: 12px; align-items: center; }
-  .bar-label { font-size: 12px; color: #94a3b8; text-align: right; line-height: 1.3; }
-  .bar-track { background: #0f1117; border-radius: 5px; height: 20px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
-  .bar-value { font-size: 12px; font-weight: 700; color: #e2e8f0; }
-
-  .hl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  @media (max-width: 500px) { .hl-grid { grid-template-columns: 1fr 1fr; } }
-  .hl-box { background: #0d1f2d; border: 1px solid #1e3a5f; border-radius: 10px; padding: 16px; }
-  .hl-label { font-size: 11px; color: #60a5fa; margin-bottom: 6px; }
-  .hl-value { font-size: 20px; font-weight: 700; color: #93c5fd; }
-  .hl-sub { font-size: 11px; color: #475569; margin-top: 3px; }
-
-  .period-label { font-size: 11px; font-weight: 700; color: #6366f1; }
-  .check-yes { color: #10b981; font-size: 16px; }
-  .check-no  { color: #ef4444; font-size: 16px; }
+.pl { font-size:11px; font-weight:700; color:#6366f1; }
+.cy { color:#10b981; }
+.cn { color:#ef4444; }
 </style>
 </head>
 <body>
 <div class="app">
-  <h1>🧮 Claude 기업 도입 비용 산정기</h1>
-  <p class="subtitle">2026년 4월 최신 Anthropic 가격 기준 · USD 기준 / 1 USD ≈ 1,370 KRW</p>
+<h1>🧮 Claude 기업 도입 비용 산정기</h1>
+<p class="subtitle">2026년 4월 최신 Anthropic 가격 기준 · 환율 1 USD = <strong style="color:#818cf8;">1,480 KRW</strong> 적용</p>
 
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('scenario')">📋 시나리오 설정</button>
-    <button class="tab" onclick="switchTab('api')">🔌 API 상세 분석</button>
-    <button class="tab" onclick="switchTab('timeline')">📅 기간별 비용</button>
-    <button class="tab" onclick="switchTab('compare')">⚖️ 플랜 비교</button>
+<div class="tabs">
+  <button class="tab active" onclick="sw('scenario')">📋 시나리오 설정</button>
+  <button class="tab" onclick="sw('api')">🔌 API 상세 분석</button>
+  <button class="tab" onclick="sw('timeline')">📅 기간별 비용</button>
+  <button class="tab" onclick="sw('compare')">⚖️ 플랜 비교</button>
+</div>
+
+<!-- SCENARIO -->
+<div id="tab-scenario" class="panel active">
+  <div class="card">
+    <div class="card-title">📌 도입 목적 선택</div>
+    <div class="sc-grid">
+      <div class="sc active" id="sc-dev"      onclick="setSc('dev')"><div class="t">💻 개발팀 코딩 보조</div><div class="d">Claude Code 중심, 개발자 생산성 향상</div></div>
+      <div class="sc"        id="sc-support"  onclick="setSc('support')"><div class="t">🎧 고객 지원 자동화</div><div class="d">챗봇 · 티켓 처리 · 대용량 쿼리 응답</div></div>
+      <div class="sc"        id="sc-doc"      onclick="setSc('doc')"><div class="t">📄 문서 분석 · 요약</div><div class="d">계약서, 보고서, 리서치 문서 처리</div></div>
+      <div class="sc"        id="sc-internal" onclick="setSc('internal')"><div class="t">🏢 사내 AI 어시스턴트</div><div class="d">임직원 업무 보조 · 지식 검색</div></div>
+      <div class="sc"        id="sc-data"     onclick="setSc('data')"><div class="t">📊 데이터 분석 파이프라인</div><div class="d">배치 처리 · 구조화 데이터 추출</div></div>
+      <div class="sc"        id="sc-custom"   onclick="setSc('custom')"><div class="t">⚙️ 직접 설정</div><div class="d">아래에서 모든 값 수동 입력</div></div>
+    </div>
   </div>
 
-  <!-- SCENARIO -->
-  <div id="tab-scenario" class="panel active">
-    <div class="card">
-      <div class="card-title">📌 도입 목적 선택</div>
-      <div class="scenario-grid">
-        <div class="sc-card active" id="sc-dev" onclick="setScenario('dev')">
-          <div class="sc-title">💻 개발팀 코딩 보조</div>
-          <div class="sc-desc">Claude Code 중심, 개발자 생산성 향상</div>
-        </div>
-        <div class="sc-card" id="sc-support" onclick="setScenario('support')">
-          <div class="sc-title">🎧 고객 지원 자동화</div>
-          <div class="sc-desc">챗봇 · 티켓 처리 · 대용량 쿼리 응답</div>
-        </div>
-        <div class="sc-card" id="sc-doc" onclick="setScenario('doc')">
-          <div class="sc-title">📄 문서 분석 · 요약</div>
-          <div class="sc-desc">계약서, 보고서, 리서치 문서 처리</div>
-        </div>
-        <div class="sc-card" id="sc-internal" onclick="setScenario('internal')">
-          <div class="sc-title">🏢 사내 AI 어시스턴트</div>
-          <div class="sc-desc">임직원 업무 보조 · 지식 검색 · 보고서</div>
-        </div>
-        <div class="sc-card" id="sc-data" onclick="setScenario('data')">
-          <div class="sc-title">📊 데이터 분석 파이프라인</div>
-          <div class="sc-desc">배치 처리 · 구조화 데이터 추출</div>
-        </div>
-        <div class="sc-card" id="sc-custom" onclick="setScenario('custom')">
-          <div class="sc-title">⚙️ 직접 설정</div>
-          <div class="sc-desc">아래에서 모든 값 수동 입력</div>
-        </div>
-      </div>
+  <div class="card" id="int-card">
+    <div class="card-title">⚡ 사용 강도 프리셋 <span style="font-size:11px;font-weight:400;color:#475569;">— 선택하면 아래 값이 자동 설정됩니다 (개발팀 기준)</span></div>
+    <div class="int-row">
+      <button class="int-btn"        id="ib-light"    onclick="setInt('light')">🌱 라이트<small>가끔 사용</small></button>
+      <button class="int-btn active" id="ib-moderate" onclick="setInt('moderate')">✨ 보통<small>하루 1~2시간</small></button>
+      <button class="int-btn"        id="ib-heavy"    onclick="setInt('heavy')">🔥 헤비<small>주력 개발 도구</small></button>
+      <button class="int-btn"        id="ib-fulltime" onclick="setInt('fulltime')">🚀 풀타임<small>Claude Code 전면 의존</small></button>
     </div>
+    <div class="int-desc" id="int-desc"></div>
+  </div>
 
-    <div class="card">
-      <div class="card-title">👥 팀 구성 & 사용 패턴</div>
-      <div class="grid-2">
-        <div><label>팀원 수 (명)</label><input type="number" id="teamSize" value="20" min="5" oninput="calc()"></div>
-        <div><label>월 근무일 (일)</label><input type="number" id="workDays" value="22" min="1" max="31" oninput="calc()"></div>
-        <div><label>1인당 일 평균 대화 수</label><input type="number" id="dailyConvs" value="15" min="1" oninput="calc()"></div>
-        <div><label>대화당 평균 입력 토큰</label><input type="number" id="inputTok" value="1500" min="100" oninput="calc()"></div>
-        <div><label>대화당 평균 출력 토큰</label><input type="number" id="outputTok" value="800" min="100" oninput="calc()"></div>
-        <div><label>프롬프트 캐싱 비율 (%)</label><input type="number" id="cacheRate" value="30" min="0" max="90" oninput="calc()"></div>
-      </div>
-    </div>
+  <div class="card">
+    <div class="card-title">👥 팀 구성 & 사용 패턴 <span style="font-size:11px;font-weight:400;color:#475569;">— ! 위에 마우스 올리면 기준 설명</span></div>
+    <div class="grid-2">
 
-    <div class="card">
-      <div class="card-title">🤖 사용 모델 설정</div>
-      <div class="model-pills" style="margin-bottom:18px;">
-        <div class="model-pill pill-haiku"  id="pill-haiku"  onclick="toggleModel('haiku')">⚡ Haiku 4.5</div>
-        <div class="model-pill pill-sonnet sel" id="pill-sonnet" onclick="toggleModel('sonnet')">✨ Sonnet 4.6</div>
-        <div class="model-pill pill-opus"   id="pill-opus"   onclick="toggleModel('opus')">🌟 Opus 4.6</div>
-      </div>
-      <div class="grid-3">
-        <div id="wrap-haiku"  style="display:none;"><label>Haiku 비율 (%)</label><input type="number" id="mix-haiku"  value="0"   min="0" max="100" oninput="calc()"></div>
-        <div id="wrap-sonnet"              ><label>Sonnet 비율 (%)</label><input type="number" id="mix-sonnet" value="100" min="0" max="100" oninput="calc()"></div>
-        <div id="wrap-opus"   style="display:none;"><label>Opus 비율 (%)</label><input type="number" id="mix-opus"   value="0"   min="0" max="100" oninput="calc()"></div>
-      </div>
-    </div>
-
-    <div class="result-hero">
       <div>
-        <div class="rh-label">월 예상 API 비용</div>
-        <div class="rh-value" id="res-monthly-usd">$0</div>
-        <div class="rh-sub" id="res-monthly-krw">₩0</div>
+        <div class="fl">팀원 수 (명)
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>👥 팀원 수</b>API 비용을 공유하는 실제 사용 인원. 구독 플랜은 이 수 × 시트 단가로 청구됩니다.
+              <div class="tr"><span class="tl">Team 플랜 최소</span><span class="tv">5명</span></div>
+              <div class="tr"><span class="tl">Enterprise 최소</span><span class="tv">20명</span></div>
+            </div>
+          </div>
+        </div>
+        <input type="number" id="teamSize" value="20" min="1" oninput="calc()">
+      </div>
+
+      <div>
+        <div class="fl">월 근무일 (일)
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>📅 월 근무일</b>한국 기준 주 5일, 월 평균 21~22일. 공휴일 많은 달은 18~19일로 낮춰 입력하세요.
+              <div class="tr"><span class="tl">평균</span><span class="tv">21~22일</span></div>
+              <div class="tr"><span class="tl">공휴일 많은 달</span><span class="tv">18~19일</span></div>
+            </div>
+          </div>
+        </div>
+        <input type="number" id="workDays" value="22" min="1" max="31" oninput="calc()">
+      </div>
+
+      <div>
+        <div class="fl">1인당 일 평균 대화 수
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>💬 일 평균 대화 수</b>사람이 의식적으로 입력하는 횟수가 아닌 <span style="color:#f59e0b;font-weight:600;">실제 API 호출 횟수</span> 기준입니다. Claude Code는 에디터 명령·에러 분석 등 자동 호출이 많아 체감보다 훨씬 많습니다.
+              <div class="tr"><span class="tl">라이트</span><span class="tv">10~20회</span></div>
+              <div class="tr"><span class="tl">보통</span><span class="tv">30~50회</span></div>
+              <div class="tr"><span class="tl">헤비</span><span class="tv">80~120회</span></div>
+              <div class="tr"><span class="tl">풀타임</span><span class="tv">150회+</span></div>
+            </div>
+          </div>
+        </div>
+        <input type="number" id="dailyConvs" value="40" min="1" oninput="calc()">
+      </div>
+
+      <div>
+        <div class="fl">대화당 평균 입력 토큰
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>📥 입력 토큰</b>프롬프트 + 코드 컨텍스트 전체 길이. 1,000토큰 ≈ 영어 750단어 ≈ 한국어 약 500자.
+              <div class="tr"><span class="tl">짧은 Q&A</span><span class="tv">200~500</span></div>
+              <div class="tr"><span class="tl">함수 리뷰</span><span class="tv">1,000~3,000</span></div>
+              <div class="tr"><span class="tl">파일 전체</span><span class="tv">5,000~15,000</span></div>
+              <div class="tr"><span class="tl">PR 리뷰</span><span class="tv">20,000~50,000</span></div>
+            </div>
+          </div>
+        </div>
+        <input type="number" id="inputTok" value="4000" min="100" oninput="calc()">
+      </div>
+
+      <div>
+        <div class="fl">대화당 평균 출력 토큰
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>📤 출력 토큰</b>Claude가 생성하는 응답 길이. 코드 생성은 텍스트보다 길고, 단가도 입력의 3~5배라 비용 영향이 큽니다.
+              <div class="tr"><span class="tl">짧은 답변</span><span class="tv">200~500</span></div>
+              <div class="tr"><span class="tl">코드 수정</span><span class="tv">1,000~3,000</span></div>
+              <div class="tr"><span class="tl">파일 생성</span><span class="tv">3,000~8,000</span></div>
+            </div>
+          </div>
+        </div>
+        <input type="number" id="outputTok" value="2000" min="100" oninput="calc()">
+      </div>
+
+      <div>
+        <div class="fl">프롬프트 캐싱 비율 (%)
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>♻️ 프롬프트 캐싱</b>반복되는 시스템 프롬프트·문서를 캐시하면 해당 입력 토큰이 <span style="color:#10b981;font-weight:600;">90% 절감</span>됩니다. 개발팀은 코딩 컨벤션·프로젝트 구조를 고정 컨텍스트로 쓸 때 효율이 높습니다.
+              <div class="tr"><span class="tl">캐시 없음</span><span class="tv">0%</span></div>
+              <div class="tr"><span class="tl">개발팀 평균</span><span class="tv">30~50%</span></div>
+              <div class="tr"><span class="tl">고객지원 봇</span><span class="tv">60~80%</span></div>
+            </div>
+          </div>
+        </div>
+        <input type="number" id="cacheRate" value="40" min="0" max="90" oninput="calc()">
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🤖 사용 모델 설정</div>
+    <div class="pills">
+      <div class="pill ph" id="pill-haiku"  onclick="togM('haiku')">⚡ Haiku 4.5 — $1/$5</div>
+      <div class="pill ps s" id="pill-sonnet" onclick="togM('sonnet')">✨ Sonnet 4.6 — $3/$15</div>
+      <div class="pill po" id="pill-opus"   onclick="togM('opus')">🌟 Opus 4.6 — $5/$25</div>
+    </div>
+    <div class="grid-3">
+      <div id="wrap-haiku" style="display:none;">
+        <div class="fl">Haiku 비율 (%)
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>⚡ Haiku 4.5 — $1/$5/MTok</b>분류·라우팅·요약 등 단순 반복 작업에 최적. 코딩 보조보단 티켓 분류·고빈도 짧은 쿼리에 적합합니다.</div>
+          </div>
+        </div>
+        <input type="number" id="mix-haiku" value="0" min="0" max="100" oninput="calc()">
+      </div>
+      <div id="wrap-sonnet">
+        <div class="fl">Sonnet 비율 (%)
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>✨ Sonnet 4.6 — $3/$15/MTok</b>대부분의 프로덕션 워크로드에 최적의 가성비. 개발팀의 일반 코딩·PR 리뷰·디버깅 주력 모델. 1M 토큰 컨텍스트 지원.</div>
+          </div>
+        </div>
+        <input type="number" id="mix-sonnet" value="100" min="0" max="100" oninput="calc()">
+      </div>
+      <div id="wrap-opus" style="display:none;">
+        <div class="fl">Opus 비율 (%)
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>🌟 Opus 4.6 — $5/$25/MTok</b>복잡한 아키텍처 설계·대규모 리팩토링·멀티스텝 에이전트에 사용. 이전 Opus 4.1($15/$75) 대비 <span style="color:#10b981;font-weight:600;">67% 저렴</span>.</div>
+          </div>
+        </div>
+        <input type="number" id="mix-opus" value="0" min="0" max="100" oninput="calc()">
+      </div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div><div class="hl">월 예상 API 비용</div><div class="hv" id="r-musd">$0</div><div class="hs" id="r-mkrw">₩0</div></div>
+    <div><div class="hl">연간 환산 비용</div><div class="hv" id="r-yusd">$0</div><div class="hs" id="r-ykrw">₩0</div></div>
+  </div>
+  <div class="srow">
+    <div class="sb"><div class="sl">월 총 대화 수</div><div class="sv" id="st-c">0<span class="su">회</span></div></div>
+    <div class="sb"><div class="sl">월 입력 토큰</div><div class="sv" id="st-i">0<span class="su">M</span></div></div>
+    <div class="sb"><div class="sl">월 출력 토큰</div><div class="sv" id="st-o">0<span class="su">M</span></div></div>
+    <div class="sb"><div class="sl">1인당 월 비용</div><div class="sv" id="st-p">$0</div></div>
+  </div>
+  <div class="tip"><strong>💡 절감 포인트:</strong> 캐싱 + Batch API 조합 시 현재 비용의 최대 <strong id="save-pct">0</strong>% 절감 가능. API 탭에서 전략별 상세 비교를 확인하세요.</div>
+</div>
+
+<!-- API -->
+<div id="tab-api" class="panel">
+  <div class="card">
+    <div class="card-title">💰 2026년 현재 모델별 가격표 (per MTok = 100만 토큰)</div>
+    <table>
+      <thead><tr><th>모델</th><th>입력</th><th>출력</th><th>캐시 읽기</th><th>배치 할인 후 (입/출)</th><th>권장 사용</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge bg">Haiku 4.5</span></td><td>$1.00</td><td>$5.00</td><td>$0.10</td><td>$0.50 / $2.50</td><td>분류, 라우팅, 요약, 고빈도 쿼리</td></tr>
+        <tr><td><span class="badge bb">Sonnet 4.6</span></td><td>$3.00</td><td>$15.00</td><td>$0.30</td><td>$1.50 / $7.50</td><td>대부분의 프로덕션 워크로드 (기본 추천)</td></tr>
+        <tr><td><span class="badge bp">Opus 4.6</span></td><td>$5.00</td><td>$25.00</td><td>$0.50</td><td>$2.50 / $12.50</td><td>복잡한 추론, 에이전트, 코드 마이그레이션</td></tr>
+      </tbody>
+    </table>
+    <div class="tip">캐시 쓰기: 기본 입력의 1.25× / 캐시 읽기: 기본 입력의 0.1× (90% 절감) / Batch API: 입·출력 50% 할인 / 환율 1 USD = 1,480 KRW</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📐 월 비용 상세 분해</div>
+    <table><thead><tr><th>항목</th><th>토큰</th><th>단가</th><th>USD</th><th>KRW</th></tr></thead>
+    <tbody id="breakdown"></tbody></table>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 최적화 전략별 비용 비교</div>
+    <div class="bc" id="opt-chart"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔧 비용 절감 전략</div>
+    <table>
+      <thead><tr><th>전략</th><th>최대 절감</th><th>적합 상황</th><th>난이도</th></tr></thead>
+      <tbody>
+        <tr><td>프롬프트 캐싱</td><td style="color:#10b981;font-weight:700;">~90%</td><td>동일 시스템 프롬프트 반복</td><td><span class="badge bg">낮음</span></td></tr>
+        <tr><td>Batch API 활용</td><td style="color:#10b981;font-weight:700;">50%</td><td>실시간 응답 불필요한 대량 처리</td><td><span class="badge bg">낮음</span></td></tr>
+        <tr><td>모델 라우팅</td><td style="color:#10b981;font-weight:700;">30–70%</td><td>태스크 복잡도별 모델 분기</td><td><span class="badge bb">중간</span></td></tr>
+        <tr><td>컨텍스트 압축</td><td style="color:#10b981;font-weight:700;">20–40%</td><td>긴 대화 히스토리 관리</td><td><span class="badge bb">중간</span></td></tr>
+        <tr><td>Opus 4.1→4.6 마이그레이션</td><td style="color:#10b981;font-weight:700;">67%</td><td>구형 모델 사용 중인 경우</td><td><span class="badge bg">낮음</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div id="tab-timeline" class="panel">
+  <div class="card">
+    <div class="card-title">⚙️ 기간 & 성장 설정</div>
+    <div class="grid-2">
+      <div><label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;">도입 기간</label>
+        <select id="duration" onchange="calc()">
+          <option value="3">3개월 (파일럿)</option>
+          <option value="6" selected>6개월 (반기)</option>
+          <option value="12">12개월 (연간)</option>
+          <option value="24">24개월 (2년)</option>
+        </select>
       </div>
       <div>
-        <div class="rh-label">연간 환산 비용</div>
-        <div class="rh-value" id="res-yearly-usd">$0</div>
-        <div class="rh-sub" id="res-yearly-krw">₩0</div>
-      </div>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-label">월 총 대화 수</div>
-        <div class="stat-value" id="st-convs">0<span class="stat-unit">회</span></div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">월 입력 토큰</div>
-        <div class="stat-value" id="st-in">0<span class="stat-unit">M</span></div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">월 출력 토큰</div>
-        <div class="stat-value" id="st-out">0<span class="stat-unit">M</span></div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">1인당 월 비용</div>
-        <div class="stat-value" id="st-per">$0</div>
-      </div>
-    </div>
-
-    <div class="tip">
-      <strong>💡 절감 포인트:</strong> 프롬프트 캐싱으로 반복 입력의 최대 90% 절감, Batch API로 추가 50% 할인.
-      캐싱+배치 병합 시 현재 예상 비용의 <strong id="save-pct">0</strong>%까지 절감 가능합니다.
-    </div>
-  </div>
-
-  <!-- API DETAIL -->
-  <div id="tab-api" class="panel">
-    <div class="card">
-      <div class="card-title">💰 2026년 현재 모델별 가격표</div>
-      <table>
-        <thead>
-          <tr><th>모델</th><th>입력 ($/MTok)</th><th>출력 ($/MTok)</th><th>캐시 읽기</th><th>배치 할인 후</th><th>권장 사용</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="badge badge-green">Haiku 4.5</span></td>
-            <td>$1.00</td><td>$5.00</td><td>$0.10</td><td>$0.50 / $2.50</td>
-            <td>분류, 라우팅, 요약, 고빈도 쿼리</td>
-          </tr>
-          <tr>
-            <td><span class="badge badge-blue">Sonnet 4.6</span></td>
-            <td>$3.00</td><td>$15.00</td><td>$0.30</td><td>$1.50 / $7.50</td>
-            <td>대부분의 프로덕션 워크로드 (기본 추천)</td>
-          </tr>
-          <tr>
-            <td><span class="badge badge-purple">Opus 4.6</span></td>
-            <td>$5.00</td><td>$25.00</td><td>$0.50</td><td>$2.50 / $12.50</td>
-            <td>복잡한 추론, 에이전트, 코드 마이그레이션</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="tip">MTok = 100만 토큰 / 캐시 쓰기는 기본 입력의 1.25× / 캐시 읽기는 기본 입력의 0.1× (90% 절감) / Batch API 시 입·출력 50% 할인</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📐 월 비용 상세 분해 (현재 설정 기준)</div>
-      <table>
-        <thead><tr><th>항목</th><th>토큰 수</th><th>단가</th><th>소계 (USD)</th></tr></thead>
-        <tbody id="breakdown-body"></tbody>
-      </table>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📊 최적화 전략별 비용 비교</div>
-      <div class="bar-chart" id="opt-chart"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">🔧 비용 절감 전략 정리</div>
-      <table>
-        <thead><tr><th>전략</th><th>최대 절감</th><th>적합 상황</th><th>구현 난이도</th></tr></thead>
-        <tbody>
-          <tr><td>프롬프트 캐싱</td><td style="color:#10b981;font-weight:700;">~90%</td><td>동일 시스템 프롬프트 반복</td><td><span class="badge badge-green">낮음</span></td></tr>
-          <tr><td>Batch API 활용</td><td style="color:#10b981;font-weight:700;">50%</td><td>실시간 응답 불필요한 대량 처리</td><td><span class="badge badge-green">낮음</span></td></tr>
-          <tr><td>모델 라우팅</td><td style="color:#10b981;font-weight:700;">30–70%</td><td>태스크 복잡도별 모델 분기</td><td><span class="badge badge-blue">중간</span></td></tr>
-          <tr><td>컨텍스트 압축</td><td style="color:#10b981;font-weight:700;">20–40%</td><td>긴 대화 히스토리 관리</td><td><span class="badge badge-blue">중간</span></td></tr>
-          <tr><td>Opus 4.1→4.6 마이그레이션</td><td style="color:#10b981;font-weight:700;">67%</td><td>구형 모델 사용 중인 경우</td><td><span class="badge badge-green">낮음</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- TIMELINE -->
-  <div id="tab-timeline" class="panel">
-    <div class="card">
-      <div class="card-title">⚙️ 기간 & 성장 설정</div>
-      <div class="grid-2">
-        <div>
-          <label>도입 기간</label>
-          <select id="duration" onchange="calc()">
-            <option value="3">3개월 (파일럿)</option>
-            <option value="6" selected>6개월 (반기)</option>
-            <option value="12">12개월 (연간)</option>
-            <option value="24">24개월 (2년)</option>
-          </select>
+        <div class="fl">월 사용량 성장률 (%)
+          <div class="tw"><button class="ib">!</button>
+            <div class="tb"><b>📈 사용량 성장률</b>팀이 Claude에 익숙해질수록 대화 수와 활용 범위가 늘어납니다.
+              <div class="tr"><span class="tl">보수적</span><span class="tv">5~10%</span></div>
+              <div class="tr"><span class="tl">일반적 확산</span><span class="tv">15~25%</span></div>
+              <div class="tr"><span class="tl">적극적 도입</span><span class="tv">30%+</span></div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label>월 사용량 성장률 (%)</label>
-          <input type="number" id="growthRate" value="15" min="0" max="200" oninput="calc()">
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📅 기간별 예상 비용 (USD)</div>
-      <div id="timeline-table" style="overflow-x:auto;"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📈 누적 비용 추이</div>
-      <div class="bar-chart" id="cum-chart" style="margin-top:8px;"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">💼 전체 기간 요약</div>
-      <div class="hl-grid">
-        <div class="hl-box"><div class="hl-label">총 예상 API 비용</div><div class="hl-value" id="tl-total">$0</div><div class="hl-sub" id="tl-total-krw">₩0</div></div>
-        <div class="hl-box"><div class="hl-label">총 토큰 사용량</div><div class="hl-value" id="tl-tokens">0 M</div><div class="hl-sub">입력 + 출력 합산</div></div>
-        <div class="hl-box"><div class="hl-label">월 평균 비용</div><div class="hl-value" id="tl-avg">$0</div><div class="hl-sub">전 기간 평균</div></div>
+        <input type="number" id="growthRate" value="15" min="0" max="200" oninput="calc()">
       </div>
     </div>
   </div>
-
-  <!-- COMPARE -->
-  <div id="tab-compare" class="panel">
-    <div class="card">
-      <div class="card-title">📋 구독 플랜 개요</div>
-      <table>
-        <thead><tr><th>플랜</th><th>가격</th><th>최소인원</th><th>사용량</th><th>Claude Code</th><th>컨텍스트</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>Team Standard</strong></td>
-            <td>$20/석·월 <small style="color:#64748b;">(연간)</small><br><small style="color:#64748b;">$25/석·월 (월납)</small></td>
-            <td>5명</td>
-            <td><span class="badge badge-green">포함</span></td>
-            <td><span class="badge badge-red">미포함</span></td>
-            <td>200K</td>
-          </tr>
-          <tr>
-            <td><strong>Team Premium</strong></td>
-            <td>$100/석·월 <small style="color:#64748b;">(연간)</small><br><small style="color:#64748b;">$125/석·월 (월납)</small></td>
-            <td>5명</td>
-            <td><span class="badge badge-green">포함</span></td>
-            <td><span class="badge badge-green">포함</span></td>
-            <td>200K</td>
-          </tr>
-          <tr>
-            <td><strong>Enterprise</strong></td>
-            <td>협의 (약 $60/석·월~)</td>
-            <td>20명</td>
-            <td><span class="badge badge-blue">별도 API 과금</span></td>
-            <td><span class="badge badge-green">포함</span></td>
-            <td>500K+</td>
-          </tr>
-          <tr>
-            <td><strong>API 직접 사용</strong></td>
-            <td>토큰당 과금</td>
-            <td>-</td>
-            <td><span class="badge badge-blue">사용량 과금</span></td>
-            <td><span class="badge badge-blue">별도</span></td>
-            <td>1M</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📊 월 총비용 비교 (현재 설정 기준)</div>
-      <div class="bar-chart" id="plan-chart" style="margin-top:8px;"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">💡 우리 팀 추천 플랜</div>
-      <div id="plan-rec"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📝 Enterprise vs Team 기능 비교</div>
-      <table>
-        <thead><tr><th>기능</th><th>Team</th><th>Enterprise</th></tr></thead>
-        <tbody>
-          <tr><td>SSO 지원</td><td><span class="check-yes">✅</span></td><td><span class="check-yes">✅</span></td></tr>
-          <tr><td>중앙 청구 관리</td><td><span class="check-yes">✅</span></td><td><span class="check-yes">✅</span></td></tr>
-          <tr><td>SCIM 프로비저닝</td><td><span class="check-no">✕</span></td><td><span class="check-yes">✅</span></td></tr>
-          <tr><td>감사 로그</td><td><span class="check-no">✕</span></td><td><span class="check-yes">✅</span></td></tr>
-          <tr><td>HIPAA 준수</td><td><span class="check-no">✕</span></td><td><span class="check-yes">✅</span></td></tr>
-          <tr><td>컨텍스트 창</td><td>200K</td><td>500K+</td></tr>
-          <tr><td>사용량 한도 설정</td><td>제한적</td><td>조직·개인별 세밀 설정</td></tr>
-          <tr><td>Microsoft 365 / Slack 통합</td><td><span class="check-yes">✅</span></td><td><span class="check-yes">✅</span></td></tr>
-          <tr><td>전용 고객 지원</td><td><span class="check-no">✕</span></td><td><span class="check-yes">✅</span></td></tr>
-          <tr><td>연간 계약</td><td>선택</td><td>필수</td></tr>
-        </tbody>
-      </table>
+  <div class="card"><div class="card-title">📅 기간별 예상 비용</div><div id="tl-table" style="overflow-x:auto;"></div></div>
+  <div class="card"><div class="card-title">📈 누적 비용 추이</div><div class="bc" id="cum-chart" style="margin-top:8px;"></div></div>
+  <div class="card">
+    <div class="card-title">💼 전체 기간 요약</div>
+    <div class="hlg">
+      <div class="hlb"><div class="hll">총 예상 API 비용</div><div class="hlv" id="tl-tot">$0</div><div class="hls" id="tl-tot-k">₩0</div></div>
+      <div class="hlb"><div class="hll">총 토큰 사용량</div><div class="hlv" id="tl-tok">0 M</div><div class="hls">입력 + 출력 합산</div></div>
+      <div class="hlb"><div class="hll">월 평균 비용</div><div class="hlv" id="tl-avg">$0</div><div class="hls" id="tl-avg-k">₩0</div></div>
     </div>
   </div>
 </div>
 
-<script>
-const PRICES = { haiku:{in:1,out:5}, sonnet:{in:3,out:15}, opus:{in:5,out:25} };
-const MODELS = ['haiku','sonnet','opus'];
-const USD_KRW = 1370;
-let selModels = new Set(['sonnet']);
-let curSc = 'dev';
+<!-- COMPARE -->
+<div id="tab-compare" class="panel">
+  <div class="card">
+    <div class="card-title">📋 구독 플랜 개요</div>
+    <table>
+      <thead><tr><th>플랜</th><th>가격</th><th>최소인원</th><th>사용량</th><th>Claude Code</th><th>컨텍스트</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Team Standard</strong></td><td>$20/석·월 (연간)<br><small style="color:#64748b;">$25/석·월 (월납)</small></td><td>5명</td><td><span class="badge bg">포함</span></td><td><span class="badge br">미포함</span></td><td>200K</td></tr>
+        <tr><td><strong>Team Premium</strong></td><td>$100/석·월 (연간)<br><small style="color:#64748b;">$125/석·월 (월납)</small></td><td>5명</td><td><span class="badge bg">포함</span></td><td><span class="badge bg">포함</span></td><td>200K</td></tr>
+        <tr><td><strong>Enterprise</strong></td><td>협의 (약 $60/석·월~)</td><td>20명</td><td><span class="badge bb">별도 API 과금</span></td><td><span class="badge bg">포함</span></td><td>500K+</td></tr>
+        <tr><td><strong>API 직접 사용</strong></td><td>토큰당 과금</td><td>-</td><td><span class="badge bb">사용량 과금</span></td><td><span class="badge bb">별도</span></td><td>1M</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card"><div class="card-title">📊 월 총비용 비교 (현재 설정 기준)</div><div class="bc" id="plan-chart" style="margin-top:8px;"></div></div>
+  <div class="card"><div class="card-title">💡 우리 팀 추천 플랜</div><div id="plan-rec"></div></div>
+  <div class="card">
+    <div class="card-title">📝 Enterprise vs Team 기능 비교</div>
+    <table>
+      <thead><tr><th>기능</th><th>Team</th><th>Enterprise</th></tr></thead>
+      <tbody>
+        <tr><td>SSO 지원</td><td><span class="cy">✅</span></td><td><span class="cy">✅</span></td></tr>
+        <tr><td>중앙 청구 관리</td><td><span class="cy">✅</span></td><td><span class="cy">✅</span></td></tr>
+        <tr><td>SCIM 프로비저닝</td><td><span class="cn">✕</span></td><td><span class="cy">✅</span></td></tr>
+        <tr><td>감사 로그</td><td><span class="cn">✕</span></td><td><span class="cy">✅</span></td></tr>
+        <tr><td>HIPAA 준수</td><td><span class="cn">✕</span></td><td><span class="cy">✅</span></td></tr>
+        <tr><td>컨텍스트 창</td><td>200K</td><td>500K+</td></tr>
+        <tr><td>사용량 한도 설정</td><td>제한적</td><td>조직·개인별 세밀 설정</td></tr>
+        <tr><td>Microsoft 365 / Slack 통합</td><td><span class="cy">✅</span></td><td><span class="cy">✅</span></td></tr>
+        <tr><td>전용 고객 지원</td><td><span class="cn">✕</span></td><td><span class="cy">✅</span></td></tr>
+        <tr><td>연간 계약</td><td>선택</td><td>필수</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
 
-const SCENARIOS = {
-  dev:     {dailyConvs:20, inputTok:2000, outputTok:1200, cacheRate:40, models:['sonnet','opus'], mix:{haiku:0,sonnet:60,opus:40}},
-  support: {dailyConvs:50, inputTok:800,  outputTok:400,  cacheRate:60, models:['haiku','sonnet'],mix:{haiku:70,sonnet:30,opus:0}},
-  doc:     {dailyConvs:10, inputTok:5000, outputTok:1500, cacheRate:50, models:['sonnet','opus'], mix:{haiku:0,sonnet:70,opus:30}},
-  internal:{dailyConvs:15, inputTok:1500, outputTok:800,  cacheRate:30, models:['sonnet'],        mix:{haiku:0,sonnet:100,opus:0}},
-  data:    {dailyConvs:30, inputTok:3000, outputTok:600,  cacheRate:70, models:['haiku','sonnet'],mix:{haiku:60,sonnet:40,opus:0}},
+<script>
+const PR={haiku:{i:1,o:5},sonnet:{i:3,o:15},opus:{i:5,o:25}};
+const ML=['haiku','sonnet','opus'];
+const KRW=1480;
+let sel=new Set(['sonnet']);
+let csc='dev', cint='moderate';
+
+const SC={
+  dev:     {dc:40,it:4000,ot:2000,cr:40,models:['sonnet','opus'],mix:{haiku:0,sonnet:60,opus:40}},
+  support: {dc:60,it:800, ot:400, cr:65,models:['haiku','sonnet'],mix:{haiku:70,sonnet:30,opus:0}},
+  doc:     {dc:12,it:8000,ot:2000,cr:50,models:['sonnet','opus'],mix:{haiku:0,sonnet:70,opus:30}},
+  internal:{dc:20,it:2000,ot:1000,cr:30,models:['sonnet'],mix:{haiku:0,sonnet:100,opus:0}},
+  data:    {dc:40,it:4000,ot:800, cr:70,models:['haiku','sonnet'],mix:{haiku:60,sonnet:40,opus:0}},
   custom:  null,
 };
 
-function n(id){return Number(document.getElementById(id).value)||0;}
-function el(id){return document.getElementById(id);}
-function fmt(v,d=0){return v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
-function usd(v){return '$'+fmt(v,v<10?2:0);}
-function krw(v){const w=v*USD_KRW; return '₩'+fmt(w,0)+' (약 '+fmt(w/10000,0)+'만원)';}
+const IT={
+  light:    {desc:'<strong>일 10~20회 호출 · 라이트</strong> — 막힐 때만 Claude에게 묻는 패턴. 주로 짧은 Q&A, 간단한 코드 설명. 컨텍스트가 작고 세션이 짧습니다. 체감상 "하루에 몇 번 물어봤다" 수준.',dc:15,it:1500,ot:700,cr:20,mix:{haiku:0,sonnet:100,opus:0}},
+  moderate: {desc:'<strong>일 30~50회 호출 · 보통</strong> — 하루 1~2시간 Claude 활용. 함수 리뷰·디버깅·PR 설명 작성 등 보조 도구로 사용. 파일 단위 컨텍스트를 붙이는 경우가 많아 토큰이 생각보다 큽니다.',dc:40,it:4000,ot:2000,cr:40,mix:{haiku:0,sonnet:60,opus:40}},
+  heavy:    {desc:'<strong>일 80~120회 호출 · 헤비</strong> — Claude Code를 주력 개발 도구로 사용. 여러 파일을 컨텍스트로 붙이는 작업이 많고, 아키텍처 설계·대형 리팩토링 포함. 1인당 비용이 Max 플랜($100/월) 수준에 도달합니다.',dc:100,it:10000,ot:4000,cr:50,mix:{haiku:0,sonnet:50,opus:50}},
+  fulltime: {desc:'<strong>일 150회+ 호출 · 풀타임 Claude Code</strong> — 에디터·터미널·CI 파이프라인 전체를 Claude가 담당. PR 전체 리뷰·대규모 코드베이스 분석·멀티파일 에이전트. API 직접 사용보다 Max 20x 구독($200/월)이 더 경제적인 수준입니다.',dc:180,it:20000,ot:7000,cr:60,mix:{haiku:0,sonnet:40,opus:60}},
+};
 
-function setScenario(k){
-  curSc=k;
-  document.querySelectorAll('.sc-card').forEach(c=>c.classList.remove('active'));
-  el('sc-'+k).classList.add('active');
-  if(k!=='custom'&&SCENARIOS[k]){
-    const s=SCENARIOS[k];
-    el('dailyConvs').value=s.dailyConvs; el('inputTok').value=s.inputTok;
-    el('outputTok').value=s.outputTok; el('cacheRate').value=s.cacheRate;
-    selModels=new Set(s.models);
-    MODELS.forEach(m=>{el('mix-'+m).value=s.mix[m];});
-    updatePills();
+const g=id=>document.getElementById(id);
+const n=id=>Number(g(id).value)||0;
+const fmt=(v,d=0)=>v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const usd=v=>'$'+fmt(v,v<10?2:0);
+const krw=v=>{const w=v*KRW; if(w>=1e8)return '₩'+fmt(w/1e8,1)+'억'; if(w>=1e4)return '₩'+fmt(w/1e4,0)+'만'; return '₩'+fmt(w,0);};
+const krwL=v=>{const w=v*KRW; return '₩'+fmt(w,0)+' (약 '+fmt(w/10000,0)+'만원)';};
+
+function setSc(k){
+  csc=k;
+  document.querySelectorAll('.sc').forEach(c=>c.classList.remove('active'));
+  g('sc-'+k).classList.add('active');
+  g('int-card').style.display=(k==='dev')?'':'none';
+  if(k!=='custom'&&SC[k]){
+    const s=SC[k];
+    g('dailyConvs').value=s.dc; g('inputTok').value=s.it;
+    g('outputTok').value=s.ot;  g('cacheRate').value=s.cr;
+    sel=new Set(s.models);
+    ML.forEach(m=>g('mix-'+m).value=s.mix[m]);
+    upPills();
+    if(k==='dev') setInt('moderate',false);
   }
   calc();
 }
 
-function updatePills(){
-  MODELS.forEach(m=>{
-    const pill=el('pill-'+m), wrap=el('wrap-'+m);
-    selModels.has(m)?pill.classList.add('sel'):pill.classList.remove('sel');
-    wrap.style.display=selModels.has(m)?'':'none';
+function setInt(key,doCalc=true){
+  cint=key;
+  document.querySelectorAll('.int-btn').forEach(b=>b.classList.remove('active'));
+  g('ib-'+key).classList.add('active');
+  const I=IT[key];
+  g('int-desc').innerHTML=I.desc;
+  g('dailyConvs').value=I.dc; g('inputTok').value=I.it;
+  g('outputTok').value=I.ot;  g('cacheRate').value=I.cr;
+  ML.forEach(m=>g('mix-'+m).value=I.mix[m]);
+  sel=new Set(ML.filter(m=>I.mix[m]>0));
+  if(sel.size===0) sel=new Set(['sonnet']);
+  upPills();
+  if(doCalc) calc();
+}
+
+function upPills(){
+  ML.forEach(m=>{
+    const pill=g('pill-'+m), wrap=g('wrap-'+m);
+    const cls=m==='haiku'?'ph':m==='sonnet'?'ps':'po';
+    sel.has(m)?pill.classList.add('s'):pill.classList.remove('s');
+    wrap.style.display=sel.has(m)?'':'none';
   });
 }
 
-function toggleModel(m){
-  if(selModels.has(m)){if(selModels.size===1)return; selModels.delete(m); el('mix-'+m).value=0;}
-  else{selModels.add(m);}
-  updatePills(); calc();
+function togM(m){
+  if(sel.has(m)){if(sel.size===1)return; sel.delete(m); g('mix-'+m).value=0;}
+  else sel.add(m);
+  upPills(); calc();
 }
 
 function getP(){
-  return {
-    teamSize:n('teamSize'), workDays:n('workDays'), dailyConvs:n('dailyConvs'),
-    inputTok:n('inputTok'), outputTok:n('outputTok'), cacheRate:n('cacheRate')/100,
-    duration:n('duration'), growthRate:n('growthRate')/100,
-    mix:{haiku:n('mix-haiku')/100, sonnet:n('mix-sonnet')/100, opus:n('mix-opus')/100}
-  };
+  return {ts:n('teamSize'),wd:n('workDays'),dc:n('dailyConvs'),it:n('inputTok'),ot:n('outputTok'),cr:n('cacheRate')/100,
+    dur:n('duration'),gr:n('growthRate')/100,mix:{haiku:n('mix-haiku')/100,sonnet:n('mix-sonnet')/100,opus:n('mix-opus')/100}};
 }
 
-function calcMonth(p, scale=1){
-  const convs = p.teamSize * p.workDays * p.dailyConvs * scale;
-  const inM   = convs * p.inputTok / 1e6;
-  const outM  = convs * p.outputTok / 1e6;
-  let inCost=0, outCost=0;
-  MODELS.forEach(m=>{
-    const r=p.mix[m]||0; if(!r) return;
-    const cr=p.cacheRate;
-    inCost  += inM * r * ((1-cr)*PRICES[m].in + cr*PRICES[m].in*0.1);
-    outCost += outM * r * PRICES[m].out;
-  });
-  return {convs, inM, outM, inCost, outCost, total:inCost+outCost};
+function cMonth(p,sc=1){
+  const convs=p.ts*p.wd*p.dc*sc, iM=convs*p.it/1e6, oM=convs*p.ot/1e6;
+  let ic=0,oc=0;
+  ML.forEach(m=>{const r=p.mix[m]||0; if(!r)return; ic+=iM*r*((1-p.cr)*PR[m].i+p.cr*PR[m].i*0.1); oc+=oM*r*PR[m].o;});
+  return {convs,iM,oM,ic,oc,tot:ic+oc};
 }
 
 function calc(){
-  const p=getP();
-  const r=calcMonth(p);
-
-  // Scenario tab
-  el('res-monthly-usd').textContent=usd(r.total);
-  el('res-monthly-krw').textContent=krw(r.total);
-  el('res-yearly-usd').textContent=usd(r.total*12);
-  el('res-yearly-krw').textContent=krw(r.total*12);
-  el('st-convs').innerHTML=fmt(r.convs)+'<span class="stat-unit">회</span>';
-  el('st-in').innerHTML=fmt(r.inM,1)+'<span class="stat-unit">M</span>';
-  el('st-out').innerHTML=fmt(r.outM,1)+'<span class="stat-unit">M</span>';
-  el('st-per').textContent=usd(r.total/Math.max(p.teamSize,1));
-  const noCacheTotal = (() => {
-    let c=0; MODELS.forEach(m=>{const ratio=p.mix[m]||0; c+=r.inM*ratio*PRICES[m].in+r.outM*ratio*PRICES[m].out;}); return c;
-  })();
-  const optTotal=r.total*0.5*0.7;
-  el('save-pct').textContent=fmt(Math.max(0,(1-optTotal/Math.max(noCacheTotal,0.01))*100),0);
-
-  updateAPI(p, r, noCacheTotal);
-  updateTimeline(p, r);
-  updateCompare(p, r);
+  const p=getP(), r=cMonth(p);
+  g('r-musd').textContent=usd(r.tot); g('r-mkrw').textContent=krwL(r.tot);
+  g('r-yusd').textContent=usd(r.tot*12); g('r-ykrw').textContent=krwL(r.tot*12);
+  g('st-c').innerHTML=fmt(r.convs)+'<span class="su">회</span>';
+  g('st-i').innerHTML=fmt(r.iM,1)+'<span class="su">M</span>';
+  g('st-o').innerHTML=fmt(r.oM,1)+'<span class="su">M</span>';
+  g('st-p').textContent=usd(r.tot/Math.max(p.ts,1));
+  const nc=(()=>{let c=0;ML.forEach(m=>{const ratio=p.mix[m]||0;c+=r.iM*ratio*PR[m].i+r.oM*ratio*PR[m].o;});return c;})();
+  g('save-pct').textContent=fmt(Math.max(0,(1-r.tot*0.35/Math.max(nc,0.01))*100),0);
+  upAPI(p,r,nc); upTL(p,r); upCmp(p,r);
 }
 
-function updateAPI(p, r, noCacheTotal){
-  // Breakdown table
+function upAPI(p,r,nc){
   let rows='';
-  MODELS.forEach(m=>{
+  ML.forEach(m=>{
     const ratio=p.mix[m]||0; if(!ratio) return;
-    const inM=r.inM*ratio, outM=r.outM*ratio;
-    const cacheM=inM*p.cacheRate, normalM=inM*(1-p.cacheRate);
-    const iNorm=normalM*PRICES[m].in, iCache=cacheM*PRICES[m].in*0.1, oCost=outM*PRICES[m].out;
-    const mName=m.charAt(0).toUpperCase()+m.slice(1);
-    if(normalM>0) rows+=`<tr><td>${mName} - 입력 (일반, ${fmt((1-p.cacheRate)*100,0)}%)</td><td>${fmt(normalM,2)}M</td><td>$${PRICES[m].in}/MTok</td><td style="color:#10b981;">${usd(iNorm)}</td></tr>`;
-    if(cacheM>0)  rows+=`<tr><td>${mName} - 입력 (캐시 읽기, ${fmt(p.cacheRate*100,0)}%)</td><td>${fmt(cacheM,2)}M</td><td>$${(PRICES[m].in*0.1).toFixed(2)}/MTok</td><td style="color:#10b981;">${usd(iCache)}</td></tr>`;
-    rows+=`<tr><td>${mName} - 출력</td><td>${fmt(outM,2)}M</td><td>$${PRICES[m].out}/MTok</td><td style="color:#10b981;">${usd(oCost)}</td></tr>`;
+    const iM=r.iM*ratio, oM=r.oM*ratio, cM=iM*p.cr, nM=iM*(1-p.cr);
+    const iN=nM*PR[m].i, iC=cM*PR[m].i*0.1, oC=oM*PR[m].o;
+    const mn=m.charAt(0).toUpperCase()+m.slice(1);
+    if(nM>0) rows+=`<tr><td>${mn} 입력 일반 (${fmt((1-p.cr)*100,0)}%)</td><td>${fmt(nM,2)}M</td><td>$${PR[m].i}/MTok</td><td style="color:#10b981;">${usd(iN)}</td><td style="color:#64748b;">${krw(iN)}</td></tr>`;
+    if(cM>0) rows+=`<tr><td>${mn} 캐시 읽기 (${fmt(p.cr*100,0)}%)</td><td>${fmt(cM,2)}M</td><td>$${(PR[m].i*0.1).toFixed(2)}/MTok</td><td style="color:#10b981;">${usd(iC)}</td><td style="color:#64748b;">${krw(iC)}</td></tr>`;
+    rows+=`<tr><td>${mn} 출력</td><td>${fmt(oM,2)}M</td><td>$${PR[m].o}/MTok</td><td style="color:#10b981;">${usd(oC)}</td><td style="color:#64748b;">${krw(oC)}</td></tr>`;
   });
-  rows+=`<tr class="total-row"><td colspan="3">월 합계</td><td>${usd(r.total)}</td></tr>`;
-  el('breakdown-body').innerHTML=rows;
+  rows+=`<tr class="ttr"><td colspan="3">월 합계</td><td>${usd(r.tot)}</td><td>${krwL(r.tot)}</td></tr>`;
+  g('breakdown').innerHTML=rows;
 
-  // Optimization chart
-  const scenarios=[
-    {label:'최적화 없음',    cost:noCacheTotal, color:'#ef4444'},
-    {label:'캐싱만 적용',    cost:r.total,      color:'#f59e0b'},
-    {label:'Batch API',      cost:r.total*0.5,  color:'#3b82f6'},
-    {label:'캐싱 + 배치',    cost:r.total*0.35, color:'#10b981'},
-    {label:'모델 라우팅 병행',cost:r.total*0.28, color:'#8b5cf6'},
-  ];
-  const maxC=Math.max(...scenarios.map(s=>s.cost), 0.01);
-  el('opt-chart').innerHTML=scenarios.map(s=>`
-    <div class="bar-row">
-      <div class="bar-label">${s.label}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,(s.cost/maxC)*100).toFixed(1)}%;background:${s.color};"></div></div>
-      <div class="bar-value">${usd(s.cost)}</div>
-    </div>`).join('');
+  const opts=[{l:'최적화 없음',c:nc,col:'#ef4444'},{l:'캐싱만 적용',c:r.tot,col:'#f59e0b'},{l:'Batch API',c:r.tot*0.5,col:'#3b82f6'},{l:'캐싱 + 배치',c:r.tot*0.35,col:'#10b981'},{l:'모델 라우팅 병행',c:r.tot*0.25,col:'#8b5cf6'}];
+  const mx=Math.max(...opts.map(o=>o.c),0.01);
+  g('opt-chart').innerHTML=opts.map(o=>`<div class="br2"><div class="blb">${o.l}</div><div class="bt"><div class="bf" style="width:${Math.max(2,o.c/mx*100).toFixed(1)}%;background:${o.col};"></div></div><div class="bv">${usd(o.c)} <span style="color:#64748b;font-size:11px;">(${krw(o.c)})</span></div></div>`).join('');
 }
 
-function updateTimeline(p, r){
-  const dur=p.duration||6, gr=p.growthRate;
-  let rows=`<table><thead><tr><th>월차</th><th>규모</th><th>대화 수</th><th>입력 토큰</th><th>출력 토큰</th><th>월 비용</th><th>누적 비용</th><th>누적(KRW)</th></tr></thead><tbody>`;
-  let cum=0, totalTok=0;
-  const cumArr=[];
+function upTL(p,r){
+  const dur=p.dur||6, gr=p.gr;
+  let rows=`<table><thead><tr><th>월차</th><th>규모</th><th>월 대화</th><th>입력</th><th>출력</th><th>월 비용(USD)</th><th>월 비용(KRW)</th><th>누적(USD)</th></tr></thead><tbody>`;
+  let cum=0,tok=0; const ca=[];
   for(let i=1;i<=dur;i++){
-    const sc=Math.pow(1+gr,i-1);
-    const m=calcMonth(p,sc);
-    cum+=m.total; totalTok+=(m.inM+m.outM);
-    cumArr.push({i,cost:m.total,cum});
-    const teamNow=Math.round(p.teamSize*Math.pow(1+gr*0.3,i-1));
-    rows+=`<tr>
-      <td><span class="period-label">${i}월차</span></td>
-      <td>${teamNow}명</td>
-      <td>${fmt(m.convs)}회</td>
-      <td>${fmt(m.inM,1)}M</td>
-      <td>${fmt(m.outM,1)}M</td>
-      <td style="color:#10b981;font-weight:700;">${usd(m.total)}</td>
-      <td style="font-weight:600;">${usd(cum)}</td>
-      <td style="color:#64748b;font-size:12px;">${krw(cum)}</td>
-    </tr>`;
+    const sc=Math.pow(1+gr,i-1), m=cMonth(p,sc);
+    cum+=m.tot; tok+=(m.iM+m.oM); ca.push({i,c:m.tot,cum});
+    rows+=`<tr><td><span class="pl">${i}월차</span></td><td>${Math.round(p.ts*Math.pow(1+gr*0.2,i-1))}명</td><td>${fmt(m.convs)}회</td><td>${fmt(m.iM,1)}M</td><td>${fmt(m.oM,1)}M</td><td style="color:#10b981;font-weight:700;">${usd(m.tot)}</td><td style="color:#64748b;">${krw(m.tot)}</td><td style="font-weight:600;">${usd(cum)}</td></tr>`;
   }
-  rows+='</tbody></table>';
-  el('timeline-table').innerHTML=rows;
-  el('tl-total').textContent=usd(cum);
-  el('tl-total-krw').textContent=krw(cum);
-  el('tl-tokens').textContent=fmt(totalTok,1)+' M tok';
-  el('tl-avg').textContent=usd(cum/dur);
-
-  const maxCum=cumArr[cumArr.length-1].cum||0.01;
-  el('cum-chart').innerHTML=`<div class="bar-chart">`+cumArr.map(c=>`
-    <div class="bar-row">
-      <div class="bar-label">${c.i}월차</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${(c.cum/maxCum*100).toFixed(1)}%;background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div></div>
-      <div class="bar-value">${usd(c.cum)}</div>
-    </div>`).join('')+'</div>';
+  g('tl-table').innerHTML=rows+'</tbody></table>';
+  g('tl-tot').textContent=usd(cum); g('tl-tot-k').textContent=krwL(cum);
+  g('tl-tok').textContent=fmt(tok,1)+' M tok';
+  g('tl-avg').textContent=usd(cum/dur); g('tl-avg-k').textContent=krwL(cum/dur);
+  const mx=ca[ca.length-1].cum||0.01;
+  g('cum-chart').innerHTML=ca.map(c=>`<div class="br2"><div class="blb">${c.i}월차</div><div class="bt"><div class="bf" style="width:${(c.cum/mx*100).toFixed(1)}%;background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div></div><div class="bv">${usd(c.cum)} <span style="color:#64748b;font-size:11px;">(${krw(c.cum)})</span></div></div>`).join('');
 }
 
-function updateCompare(p, r){
-  const ts=p.teamSize||1, monthly=r.total;
-  const plans=[
-    {label:'Team Standard (연간)',  cost:ts*20,          color:'#10b981'},
-    {label:'Team Standard (월납)',  cost:ts*25,          color:'#34d399'},
-    {label:'Team Premium (연간)',   cost:ts*100,         color:'#3b82f6'},
-    {label:'API만 사용',            cost:monthly,        color:'#6366f1'},
-    {label:'Enterprise+API (추정)', cost:ts*60+monthly,  color:'#8b5cf6'},
-  ];
-  const maxC=Math.max(...plans.map(x=>x.cost),0.01);
-  el('plan-chart').innerHTML=plans.map(x=>`
-    <div class="bar-row">
-      <div class="bar-label">${x.label}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,(x.cost/maxC)*100).toFixed(1)}%;background:${x.color};"></div></div>
-      <div class="bar-value">${usd(x.cost)}/월</div>
-    </div>`).join('');
-
-  // Recommendation
+function upCmp(p,r){
+  const ts=p.ts||1, m=r.tot;
+  const plans=[{l:'Team Standard (연간)',c:ts*20,col:'#10b981'},{l:'Team Standard (월납)',c:ts*25,col:'#34d399'},{l:'Team Premium (연간)',c:ts*100,col:'#3b82f6'},{l:'API만 사용',c:m,col:'#6366f1'},{l:'Enterprise+API (추정)',c:ts*60+m,col:'#8b5cf6'}];
+  const mx=Math.max(...plans.map(x=>x.c),0.01);
+  g('plan-chart').innerHTML=plans.map(x=>`<div class="br2"><div class="blb">${x.l}</div><div class="bt"><div class="bf" style="width:${Math.max(2,x.c/mx*100).toFixed(1)}%;background:${x.col};"></div></div><div class="bv">${usd(x.c)}/월 <span style="color:#64748b;font-size:11px;">(${krw(x.c)})</span></div></div>`).join('');
   let rec='';
-  if(ts<5){
-    rec=`<div class="tip"><strong>💡 Pro 개인 플랜:</strong> 팀이 5명 미만이므로 Team 플랜 최소 인원 미달입니다. Pro 개인 플랜($20/월) 또는 API 직접 사용을 추천합니다.</div>`;
-  } else if(monthly<ts*20*0.6){
-    rec=`<div class="tip"><strong>💡 API 직접 사용 추천:</strong> 예상 API 비용(${usd(monthly)}/월)이 Team Standard 구독료(${usd(ts*20)}/월)보다 낮습니다. 커스텀 통합이 가능하다면 API가 경제적입니다.</div>`;
-  } else if(curSc==='dev'){
-    rec=`<div class="tip"><strong>💡 Team Premium 추천:</strong> 개발팀에는 Claude Code 포함 Premium 석($100/석·월)이 필수입니다. 코딩 보조 효과로 ROI가 빠르게 회수됩니다.</div>`;
-  } else {
-    rec=`<div class="tip"><strong>💡 Team Standard 추천:</strong> ${ts}명 규모에 $20/석·월(연간)의 Team Standard가 최적입니다. 예측 가능한 비용으로 협업 기능을 활용하세요.</div>`;
-  }
-  if(ts>=20){
-    rec+=`<div class="tip" style="margin-top:10px;"><strong>🏢 Enterprise 검토:</strong> 20명 이상 조직은 Enterprise(최소 20석, 연간 계약)를 Anthropic 영업팀과 협의하세요. SCIM·감사 로그·500K 컨텍스트·HIPAA 지원 포함. <a href="https://claude.com/contact-sales" target="_blank">→ 영업팀 문의</a></div>`;
-  }
-  el('plan-rec').innerHTML=rec;
+  if(ts<5)           rec=`<div class="tip"><strong>💡 Pro 개인 플랜:</strong> 5명 미만이므로 Team 플랜 최소 인원 미달. Pro($20/월) 또는 API 직접 사용을 추천합니다.</div>`;
+  else if(m<ts*20*.6)rec=`<div class="tip"><strong>💡 API 직접 사용 추천:</strong> 예상 API 비용(${usd(m)}/월, ${krw(m)})이 Team Standard(${usd(ts*20)}/월)보다 낮습니다.</div>`;
+  else if(csc==='dev')rec=`<div class="tip"><strong>💡 Team Premium 추천:</strong> 개발팀은 Claude Code 포함 Premium 석($100/석·월, ${krw(100)}/석·월)이 필수입니다.</div>`;
+  else                rec=`<div class="tip"><strong>💡 Team Standard 추천:</strong> ${ts}명 규모에 $20/석·월(연간) Team Standard가 최적입니다.</div>`;
+  if(ts>=20) rec+=`<div class="tip" style="margin-top:10px;"><strong>🏢 Enterprise 검토:</strong> 20명 이상은 Enterprise(연간 계약, 최소 20석)를 영업팀과 협의하세요. <a href="https://claude.com/contact-sales" target="_blank">→ 영업팀 문의</a></div>`;
+  g('plan-rec').innerHTML=rec;
 }
 
-function switchTab(name){
-  const names=['scenario','api','timeline','compare'];
-  document.querySelectorAll('.tab').forEach((t,i)=>{ names[i]===name?t.classList.add('active'):t.classList.remove('active'); });
+function sw(name){
+  const ns=['scenario','api','timeline','compare'];
+  document.querySelectorAll('.tab').forEach((t,i)=>{ns[i]===name?t.classList.add('active'):t.classList.remove('active');});
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  el('tab-'+name).classList.add('active');
+  g('tab-'+name).classList.add('active');
   calc();
 }
 
-updatePills(); calc();
+upPills();
+g('int-desc').innerHTML=IT['moderate'].desc;
+calc();
 </script>
 </body>
 </html>
