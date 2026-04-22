@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>SSG 데이터 소싱 방안 도식</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+    background: #f5f6f8;
+    color: #1a1a1a;
+    padding: 40px 24px;
+    line-height: 1.5;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #0b2545;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 40px;
+  }
+  .diagram-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .diagram-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #0b2545;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-a { background: #e3f2fd; color: #1565c0; }
+  .badge-b { background: #fff3e0; color: #ef6c00; }
+  .diagram-desc {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+  .svg-wrap {
+    width: 100%;
+    overflow-x: auto;
+    padding: 16px 0;
+  }
+  svg { display: block; margin: 0 auto; }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-size: 12px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch {
+    width: 16px; height: 16px; border-radius: 3px;
+  }
+
+  .flow-steps {
+    margin-top: 24px;
+    padding: 16px 20px;
+    background: #f8f9fb;
+    border-left: 3px solid #1565c0;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .flow-steps.orange { border-left-color: #ef6c00; }
+  .flow-steps strong { color: #0b2545; }
+  .flow-steps ol { margin-left: 20px; margin-top: 8px; }
+  .flow-steps li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>SSG 데이터 소싱 아키텍처 도식</h1>
+  <div class="subtitle">PC Banking React Router v7 / Framework 모드 · 운영 WAS 직접 호출 불가 환경</div>
+
+  <!-- 방안 1 -->
+  <section class="diagram-section">
+    <div class="diagram-title">
+      <span class="badge badge-a">방안 1</span>
+      정적 데이터 스냅샷 파이프라인 (JSON Export)
+    </div>
+    <div class="diagram-desc">
+      운영 WAS가 배치로 JSON 스냅샷을 사내 저장소에 push → 빌드 서버는 저장소에서만 데이터를 읽어 SSG 수행
+    </div>
+
+    <div class="svg-wrap">
+    <svg width="1100" height="420" viewBox="0 0 1100 420" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1565c0"/>
+        </marker>
+        <marker id="arrow1-gray" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+        </marker>
+        <marker id="arrow1-red" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#c62828"/>
+        </marker>
+      </defs>
+
+      <!-- 운영망 영역 -->
+      <rect x="20" y="40" width="300" height="340" rx="10"
+            fill="#fff5f5" stroke="#e57373" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <text x="170" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">
+        운영망 (Production Zone)
+      </text>
+
+      <!-- 빌드/사내망 영역 -->
+      <rect x="360" y="40" width="720" height="340" rx="10"
+            fill="#f3f8ff" stroke="#64b5f6" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <text x="720" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#1565c0">
+        빌드/사내망 (Build &amp; Internal Zone)
+      </text>
+
+      <!-- 운영 WAS -->
+      <rect x="60" y="100" width="220" height="70" rx="8"
+            fill="#fff" stroke="#c62828" stroke-width="2"/>
+      <text x="170" y="130" text-anchor="middle" font-size="14" font-weight="700" fill="#0b2545">운영 WAS</text>
+      <text x="170" y="150" text-anchor="middle" font-size="11" fill="#666">상품/공지/이율/배너</text>
+
+      <!-- Export Batch -->
+      <rect x="60" y="210" width="220" height="70" rx="8"
+            fill="#fff" stroke="#c62828" stroke-width="2"/>
+      <text x="170" y="240" text-anchor="middle" font-size="14" font-weight="700" fill="#0b2545">Export 배치 Job</text>
+      <text x="170" y="258" text-anchor="middle" font-size="11" fill="#666">주기/수동 트리거</text>
+
+      <!-- 화살표 WAS → Export -->
+      <line x1="170" y1="170" x2="170" y2="205" stroke="#888" stroke-width="2" marker-end="url(#arrow1-gray)"/>
+      <text x="185" y="192" font-size="10" fill="#666">SELECT</text>
+
+      <!-- 방화벽 -->
+      <line x1="340" y1="70" x2="340" y2="370" stroke="#c62828" stroke-width="3" stroke-dasharray="10 4"/>
+      <text x="340" y="385" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">🔒 방화벽</text>
+
+      <!-- 차단된 직접 호출 표시 -->
+      <path d="M 280 130 Q 340 130 400 130" stroke="#c62828" stroke-width="2" fill="none" stroke-dasharray="4 3"/>
+      <text x="340" y="120" text-anchor="middle" font-size="11" fill="#c62828" font-weight="700">✕ 직접호출 차단</text>
+
+      <!-- 사내 저장소 -->
+      <rect x="400" y="210" width="220" height="70" rx="8"
+            fill="#fff" stroke="#1565c0" stroke-width="2"/>
+      <text x="510" y="240" text-anchor="middle" font-size="14" font-weight="700" fill="#0b2545">사내 아티팩트 저장소</text>
+      <text x="510" y="258" text-anchor="middle" font-size="11" fill="#666">Nexus / 내부 S3 / 파일서버</text>
+
+      <!-- Export → 저장소 (단방향 push) -->
+      <line x1="280" y1="245" x2="395" y2="245" stroke="#1565c0" stroke-width="2" marker-end="url(#arrow1)"/>
+      <text x="337" y="235" text-anchor="middle" font-size="11" font-weight="700" fill="#1565c0">① 단방향 push</text>
+      <text x="337" y="268" text-anchor="middle" font-size="10" fill="#1565c0">snapshot-v{ts}.json</text>
+
+      <!-- 빌드 서버 -->
+      <rect x="700" y="100" width="220" height="70" rx="8"
+            fill="#fff" stroke="#1565c0" stroke-width="2"/>
+      <text x="810" y="130" text-anchor="middle" font-size="14" font-weight="700" fill="#0b2545">빌드 서버</text>
+      <text x="810" y="150" text-anchor="middle" font-size="11" fill="#666">Vite / react-router build</text>
+
+      <!-- CDN -->
+      <rect x="700" y="280" width="220" height="70" rx="8"
+            fill="#fff" stroke="#2e7d32" stroke-width="2"/>
+      <text x="810" y="310" text-anchor="middle" font-size="14" font-weight="700" fill="#0b2545">CDN / 정적 호스팅</text>
+      <text x="810" y="328" text-anchor="middle" font-size="11" fill="#666">prerender된 HTML 서빙</text>
+
+      <!-- 저장소 → 빌드서버 -->
+      <path d="M 620 230 Q 665 230 700 160" stroke="#1565c0" stroke-width="2" fill="none" marker-end="url(#arrow1)"/>
+      <text x="640" y="195" font-size="11" font-weight="700" fill="#1565c0">② fetch JSON</text>
+
+      <!-- 빌드서버 → CDN -->
+      <line x1="810" y1="175" x2="810" y2="275" stroke="#2e7d32" stroke-width="2" marker-end="url(#arrow1)"/>
+      <text x="825" y="230" font-size="11" font-weight="700" fill="#2e7d32">③ deploy</text>
+
+      <!-- 사용자 -->
+      <rect x="970" y="280" width="100" height="70" rx="8"
+            fill="#fff" stroke="#555" stroke-width="2"/>
+      <text x="1020" y="310" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">사용자</text>
+      <text x="1020" y="328" text-anchor="middle" font-size="10" fill="#666">브라우저/봇</text>
+
+      <line x1="920" y1="315" x2="965" y2="315" stroke="#555" stroke-width="2" marker-end="url(#arrow1-gray)"/>
+    </svg>
+    </div>
+
+    <div class="flow-steps">
+      <strong>데이터 플로우</strong>
+      <ol>
+        <li><strong>①</strong> 운영 WAS의 Export Job이 스냅샷 JSON을 사내 저장소로 <em>단방향 push</em> (운영→빌드망 방향만 허용)</li>
+        <li><strong>②</strong> 빌드 서버가 <code>react-router.config.ts</code>의 <code>prerender</code>에서 저장소 URL을 fetch</li>
+        <li><strong>③</strong> SSG HTML 생성 후 CDN 배포 → 사용자에게 서빙</li>
+      </ol>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:#fff5f5;border:1px solid #e57373;"></span>운영망</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#f3f8ff;border:1px solid #64b5f6;"></span>빌드/사내망</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#c62828;"></span>차단된 경로</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#1565c0;"></span>허용된 데이터 흐름</div>
+    </div>
+  </section>
+
+  <!-- 방안 3 -->
+  <section class="diagram-section">
+    <div class="diagram-title">
+      <span class="badge badge-b">방안 3</span>
+      SSG Shell + 런타임 로딩 + Playwright 크롤러 하이브리드
+    </div>
+    <div class="diagram-desc">
+      빌드 시엔 데이터 없는 Shell HTML만 생성 · 배포 후 Playwright 크롤러가 실제 렌더링된 HTML로 덮어씀 · 런타임 clientLoader가 WAS 데이터 로드
+    </div>
+
+    <div class="svg-wrap">
+    <svg width="1100" height="520" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#ef6c00"/>
+        </marker>
+        <marker id="arrow3-green" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#2e7d32"/>
+        </marker>
+        <marker id="arrow3-gray" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+        </marker>
+      </defs>
+
+      <!-- Phase 1: Build -->
+      <rect x="20" y="40" width="340" height="200" rx="10"
+            fill="#fff8f0" stroke="#ffb74d" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <text x="190" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#ef6c00">
+        Phase 1 · 빌드 (WAS 호출 없음)
+      </text>
+
+      <rect x="60" y="90" width="260" height="60" rx="8"
+            fill="#fff" stroke="#ef6c00" stroke-width="2"/>
+      <text x="190" y="115" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">빌드 서버</text>
+      <text x="190" y="133" text-anchor="middle" font-size="11" fill="#666">Shell HTML만 prerender</text>
+
+      <rect x="60" y="165" width="260" height="60" rx="8"
+            fill="#fff" stroke="#ef6c00" stroke-width="2"/>
+      <text x="190" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">Shell HTML (데이터 없음)</text>
+      <text x="190" y="206" text-anchor="middle" font-size="10" fill="#666">레이아웃 · 라우트 · 스켈레톤 · SEO placeholder</text>
+
+      <line x1="190" y1="150" x2="190" y2="162" stroke="#ef6c00" stroke-width="2" marker-end="url(#arrow3)"/>
+
+      <!-- Phase 2: Crawler -->
+      <rect x="380" y="40" width="340" height="440" rx="10"
+            fill="#fff8f0" stroke="#ffb74d" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <text x="550" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#ef6c00">
+        Phase 2 · 사후 크롤링 (배포 후)
+      </text>
+
+      <!-- CDN (Shell) -->
+      <rect x="420" y="90" width="260" height="60" rx="8"
+            fill="#fff" stroke="#2e7d32" stroke-width="2"/>
+      <text x="550" y="115" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">CDN (Shell HTML)</text>
+      <text x="550" y="133" text-anchor="middle" font-size="11" fill="#666">초기 배포 상태</text>
+
+      <!-- 빌드서버 → CDN -->
+      <path d="M 320 120 Q 360 120 415 120" stroke="#2e7d32" stroke-width="2" fill="none" marker-end="url(#arrow3-green)"/>
+      <text x="368" y="110" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">① deploy</text>
+
+      <!-- Playwright Crawler -->
+      <rect x="420" y="180" width="260" height="80" rx="8"
+            fill="#fff" stroke="#ef6c00" stroke-width="2"/>
+      <text x="550" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">Playwright Crawler</text>
+      <text x="550" y="226" text-anchor="middle" font-size="11" fill="#666">puppeteer-core + 로컬 Chrome</text>
+      <text x="550" y="244" text-anchor="middle" font-size="11" fill="#666">m.kbanknow.com 렌더링</text>
+
+      <line x1="550" y1="150" x2="550" y2="177" stroke="#ef6c00" stroke-width="2" marker-end="url(#arrow3)"/>
+      <text x="565" y="167" font-size="10" fill="#ef6c00">② 크롤</text>
+
+      <!-- Rendered HTML -->
+      <rect x="420" y="290" width="260" height="60" rx="8"
+            fill="#fff" stroke="#ef6c00" stroke-width="2"/>
+      <text x="550" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">Rendered HTML</text>
+      <text x="550" y="333" text-anchor="middle" font-size="11" fill="#666">데이터 채워진 완성본</text>
+
+      <line x1="550" y1="260" x2="550" y2="287" stroke="#ef6c00" stroke-width="2" marker-end="url(#arrow3)"/>
+
+      <!-- CDN 덮어쓰기 -->
+      <rect x="420" y="390" width="260" height="60" rx="8"
+            fill="#fff" stroke="#2e7d32" stroke-width="2"/>
+      <text x="550" y="415" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">CDN 덮어쓰기</text>
+      <text x="550" y="433" text-anchor="middle" font-size="11" fill="#666">③ Rendered HTML 반영</text>
+
+      <line x1="550" y1="350" x2="550" y2="387" stroke="#2e7d32" stroke-width="2" marker-end="url(#arrow3-green)"/>
+
+      <!-- Phase 3: Runtime -->
+      <rect x="740" y="40" width="340" height="440" rx="10"
+            fill="#f3f8ff" stroke="#64b5f6" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <text x="910" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#1565c0">
+        Phase 3 · 런타임 (사용자 접속)
+      </text>
+
+      <!-- 사용자 -->
+      <rect x="780" y="90" width="260" height="60" rx="8"
+            fill="#fff" stroke="#555" stroke-width="2"/>
+      <text x="910" y="115" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">사용자 브라우저</text>
+      <text x="910" y="133" text-anchor="middle" font-size="11" fill="#666">React Hydration</text>
+
+      <!-- CDN → 사용자 -->
+      <path d="M 680 420 Q 780 420 840 155" stroke="#2e7d32" stroke-width="2" fill="none" marker-end="url(#arrow3-green)"/>
+      <text x="770" y="295" font-size="11" font-weight="700" fill="#2e7d32" transform="rotate(-52 770 295)">④ HTML 서빙</text>
+
+      <!-- clientLoader -->
+      <rect x="780" y="180" width="260" height="70" rx="8"
+            fill="#fff" stroke="#1565c0" stroke-width="2"/>
+      <text x="910" y="205" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">clientLoader</text>
+      <text x="910" y="223" text-anchor="middle" font-size="11" fill="#666">런타임 데이터 fetch</text>
+      <text x="910" y="240" text-anchor="middle" font-size="11" fill="#666">(React Router v7)</text>
+
+      <line x1="910" y1="150" x2="910" y2="177" stroke="#1565c0" stroke-width="2" marker-end="url(#arrow3-gray)"/>
+
+      <!-- 운영 WAS -->
+      <rect x="780" y="300" width="260" height="70" rx="8"
+            fill="#fff" stroke="#c62828" stroke-width="2"/>
+      <text x="910" y="325" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">운영 WAS</text>
+      <text x="910" y="343" text-anchor="middle" font-size="11" fill="#666">실시간 데이터 응답</text>
+      <text x="910" y="360" text-anchor="middle" font-size="10" fill="#c62828">(브라우저↔WAS는 허용)</text>
+
+      <line x1="910" y1="250" x2="910" y2="297" stroke="#1565c0" stroke-width="2" marker-end="url(#arrow3-gray)"/>
+      <text x="925" y="278" font-size="10" fill="#1565c0">⑤ API 호출</text>
+
+      <!-- 최종 HTML -->
+      <rect x="780" y="410" width="260" height="60" rx="8"
+            fill="#fff" stroke="#2e7d32" stroke-width="2"/>
+      <text x="910" y="435" text-anchor="middle" font-size="13" font-weight="700" fill="#0b2545">완성된 페이지</text>
+      <text x="910" y="453" text-anchor="middle" font-size="11" fill="#666">⑥ 최신 데이터로 Hydrate</text>
+
+      <line x1="910" y1="370" x2="910" y2="407" stroke="#2e7d32" stroke-width="2" marker-end="url(#arrow3-green)"/>
+    </svg>
+    </div>
+
+    <div class="flow-steps orange">
+      <strong>데이터 플로우</strong>
+      <ol>
+        <li><strong>①</strong> 빌드 서버가 WAS 호출 없이 Shell HTML(레이아웃·스켈레톤)만 prerender하여 CDN 배포</li>
+        <li><strong>②</strong> 배포 후 Playwright Crawler가 실제 도메인을 렌더링하여 데이터가 채워진 HTML 생성</li>
+        <li><strong>③</strong> Rendered HTML을 CDN에 덮어씀 → 검색엔진 봇/초기 접속자는 완성본 수신</li>
+        <li><strong>④</strong> 사용자 접속 시 CDN에서 HTML 서빙 (Shell 또는 Rendered)</li>
+        <li><strong>⑤</strong> Hydration 후 <code>clientLoader</code>가 운영 WAS를 직접 호출하여 최신 데이터 확보</li>
+        <li><strong>⑥</strong> 최신 데이터로 화면 갱신 → 실시간성 확보</li>
+      </ol>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:#fff8f0;border:1px solid #ffb74d;"></span>빌드/크롤러 단계</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#f3f8ff;border:1px solid #64b5f6;"></span>런타임 단계</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#ef6c00;"></span>크롤러 흐름</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#2e7d32;"></span>배포/서빙</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#1565c0;"></span>런타임 API</div>
+    </div>
+  </section>
+
+  <!-- 핵심 차이 요약 -->
+  <section class="diagram-section">
+    <div class="diagram-title">핵심 차이 한눈에 보기</div>
+    <div class="svg-wrap">
+    <svg width="1000" height="220" viewBox="0 0 1000 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- 방안 1 타임라인 -->
+      <text x="20" y="40" font-size="13" font-weight="700" fill="#1565c0">방안 1</text>
+      <line x1="80" y1="55" x2="960" y2="55" stroke="#ccc" stroke-width="1"/>
+
+      <rect x="80" y="40" width="200" height="30" rx="4" fill="#1565c0"/>
+      <text x="180" y="60" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">스냅샷 Export</text>
+
+      <rect x="290" y="40" width="220" height="30" rx="4" fill="#1976d2"/>
+      <text x="400" y="60" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">빌드 (JSON 읽기)</text>
+
+      <rect x="520" y="40" width="180" height="30" rx="4" fill="#2e7d32"/>
+      <text x="610" y="60" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">CDN 배포</text>
+
+      <rect x="710" y="40" width="250" height="30" rx="4" fill="#43a047"/>
+      <text x="835" y="60" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">사용자 → 완성 HTML 수신</text>
+
+      <text x="80" y="90" font-size="11" fill="#666">✓ 빌드 시점에 데이터 확정 · 첫 응답부터 완성본</text>
+
+      <!-- 방안 3 타임라인 -->
+      <text x="20" y="140" font-size="13" font-weight="700" fill="#ef6c00">방안 3</text>
+      <line x1="80" y1="155" x2="960" y2="155" stroke="#ccc" stroke-width="1"/>
+
+      <rect x="80" y="140" width="180" height="30" rx="4" fill="#ef6c00"/>
+      <text x="170" y="160" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">Shell 빌드</text>
+
+      <rect x="270" y="140" width="150" height="30" rx="4" fill="#43a047"/>
+      <text x="345" y="160" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">Shell 배포</text>
+
+      <rect x="430" y="140" width="200" height="30" rx="4" fill="#f57c00"/>
+      <text x="530" y="160" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">Crawler 렌더링</text>
+
+      <rect x="640" y="140" width="140" height="30" rx="4" fill="#43a047"/>
+      <text x="710" y="160" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">CDN 덮어쓰기</text>
+
+      <rect x="790" y="140" width="170" height="30" rx="4" fill="#1976d2"/>
+      <text x="875" y="160" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">런타임 API 호출</text>
+
+      <text x="80" y="190" font-size="11" fill="#666">✓ 배포 직후엔 Shell만 · 크롤러 완료 후 완성 · 런타임에 최신화</text>
+    </svg>
+    </div>
+  </section>
+</div>
+</body>
+</html>
