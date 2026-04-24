@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>figma-to-react — 방향성 초안</title>
+<style>
+  :root {
+    --fg: #1f2328;
+    --fg-muted: #656d76;
+    --bg: #ffffff;
+    --border: #e3e6ea;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* 기능 색상 */
+    --c-tokens:   #7a4cff; --c-tokens-bg:   #f2ecff;
+    --c-compo:    #2d5bff; --c-compo-bg:    #eaf0ff;
+    --c-screen:   #12a25b; --c-screen-bg:   #e6f6ec;
+    --c-skill:    #d97706; --c-skill-bg:    #fdf1dc;
+    --c-verify:   #c4344b; --c-verify-bg:   #fdecee;
+    --c-docs:     #4b6478; --c-docs-bg:     #eef2f5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  main { max-width: 960px; margin: 0 auto; padding: 40px 28px 80px; }
+
+  header.doc { margin-bottom: 28px; }
+  header.doc .tag { display: inline-block; font-size: 12px; color: var(--fg-muted); background: #f6f7f9; border: 1px solid var(--border); padding: 2px 10px; border-radius: 999px; margin-bottom: 10px; }
+  header.doc h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; font-weight: 700; }
+  header.doc .sub { color: var(--fg-muted); font-size: 14px; }
+
+  h2 { font-size: 20px; margin: 44px 0 8px; letter-spacing: -0.01em; font-weight: 700; }
+  h2 .small { font-size: 13px; color: var(--fg-muted); font-weight: 400; margin-left: 8px; }
+  h3 { font-size: 15px; margin: 22px 0 6px; font-weight: 600; }
+  p { margin: 6px 0; }
+  p.lead { color: var(--fg-muted); font-size: 14.5px; margin-bottom: 14px; }
+
+  code { font-family: var(--mono); font-size: 12.5px; background: #f6f7f9; padding: 1px 6px; border-radius: 4px; }
+  ul { padding-left: 20px; margin: 6px 0; }
+  li { margin: 3px 0; }
+
+  /* === 목적/기대효과 === */
+  .purpose {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .purpose .p-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: #fafbfc;
+  }
+  .purpose .p-card h4 { margin: 0 0 6px; font-size: 14px; }
+  .purpose .p-card .effect {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+  .purpose .p-card .effect strong { color: var(--fg); }
+  @media (max-width: 700px) { .purpose { grid-template-columns: 1fr; } }
+
+  /* === 저장소 구조 컬러 그룹 === */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .legend .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .legend .chip::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--dot, #ccc);
+  }
+  .tree {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.85;
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .tree .g {
+    display: inline-block;
+    padding: 0 6px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+  }
+  .tree .g-tokens { background: var(--c-tokens-bg); border-color: #dcd0ff; color: #3f2b8f; }
+  .tree .g-compo  { background: var(--c-compo-bg);  border-color: #c7d4ff; color: #123099; }
+  .tree .g-screen { background: var(--c-screen-bg); border-color: #bbe3cb; color: #07663b; }
+  .tree .g-skill  { background: var(--c-skill-bg);  border-color: #f0d3a2; color: #7a4006; }
+  .tree .g-verify { background: var(--c-verify-bg); border-color: #f2c2ca; color: #841b2c; }
+  .tree .g-docs   { background: var(--c-docs-bg);   border-color: #c8d2da; color: #2e4152; }
+  .tree .note { color: var(--fg-muted); }
+
+  /* === 업무 흐름 도식 === */
+  .flow-diagram {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 18px 12px;
+    background: #fafbfc;
+    margin: 14px 0 8px;
+  }
+  .flow-title { font-size: 13px; font-weight: 600; color: var(--fg-muted); margin-bottom: 12px; letter-spacing: 0.02em; }
+  .lanes {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    row-gap: 10px;
+    column-gap: 10px;
+  }
+  .lane-label {
+    font-size: 12px;
+    color: var(--fg-muted);
+    font-weight: 600;
+    padding: 6px 0;
+    align-self: center;
+    border-right: 2px solid var(--border);
+    padding-right: 10px;
+    text-align: right;
+  }
+  .lane-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+  }
+  .node {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #fff;
+    white-space: nowrap;
+  }
+  .node.mcp    { background: #eef7ff; border-color: #b7d8f3; }
+  .node.claude { background: #eaf0ff; border-color: #c7d4ff; }
+  .node.gate   { background: #fdecee; border-color: #f2c2ca; color: #841b2c; font-weight: 600; }
+  .node.gate.pass { background: #e6f6ec; border-color: #bbe3cb; color: #07663b; }
+  .node.user   { background: #fdf1dc; border-color: #f0d3a2; }
+  .node.out    { background: #f2ecff; border-color: #dcd0ff; }
+  .arrow {
+    color: var(--fg-muted);
+    font-size: 14px;
+    padding: 0 2px;
+  }
+  .fork {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stamp {
+    font-size: 10.5px;
+    color: var(--fg-muted);
+    font-style: italic;
+    padding: 0 4px;
+  }
+  .loopback {
+    font-size: 12px;
+    color: var(--c-verify);
+    padding: 2px 8px;
+    border: 1px dashed var(--c-verify);
+    border-radius: 999px;
+    background: #fff;
+  }
+
+  /* === 간단 카드 (부연설명) === */
+  .notebox {
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--c-compo);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 13.5px;
+    color: var(--fg-muted);
+  }
+  .notebox strong { color: var(--fg); }
+
+  /* === 배포 블록 === */
+  .deploy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .deploy .d-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #fff;
+  }
+  .deploy .d-card h4 { margin: 0 0 8px; font-size: 14px; }
+  .deploy .d-card dl { margin: 0; display: grid; grid-template-columns: 100px 1fr; gap: 4px 12px; font-size: 13px; }
+  .deploy .d-card dt { color: var(--fg-muted); }
+  .deploy .d-card dd { margin: 0; }
+  @media (max-width: 700px) { .deploy { grid-template-columns: 1fr; } }
+
+  @media print {
+    main { padding: 20px; }
+    .flow-diagram, .deploy .d-card, .purpose .p-card, .tree { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header class="doc">
+  <span class="tag">방향성 초안 · v0.1</span>
+  <h1>figma-to-react — 작업 방식 정리</h1>
+  <div class="sub">Figma를 원본으로 두고 React 공통 컴포넌트/화면을 반복 가능하게 뽑아내기 위한 세팅. 아직 확정본은 아니고, 무엇을 왜 이렇게 만들어두고 있는지 공유용 문서.</div>
+</header>
+
+<!-- ============================================================= -->
+<section>
+<h2>1. 목적 &amp; 기대효과</h2>
+<p class="lead">지금 이 세팅으로 줄이려는 건 크게 두 가지다. 각 목적마다 "되면 뭐가 좋은가"를 바로 붙였다.</p>
+
+<div class="purpose">
+
+  <div class="p-card" style="border-top: 3px solid var(--c-compo);">
+    <h4>① 기획/퍼블리싱 확인 루프 단축</h4>
+    <p style="font-size:13.5px; margin:0;">Figma → 코드 초안까지를 PL 혼자 돌릴 수 있게 한다. 카피·토큰·레이아웃을 사람이 육안으로 대조하던 단계를 자동 검증으로 옮겼다.</p>
+    <div class="effect">
+      <strong>기대효과</strong><br>
+      · 기획/디자이너 재확인 요청 감소 (카피 임의 수정·토큰 누락이 머지 전에 걸림)<br>
+      · 화면 초안 생성 → 1차 리뷰까지 소요 단축<br>
+      · "Figma와 다르네요" 티케팅이 Storybook 단일 URL 공유로 대체
+    </div>
+  </div>
+
+  <div class="p-card" style="border-top: 3px solid var(--c-screen);">
+    <h4>② 사내망 핸드오프 리스크 축소</h4>
+    <p style="font-size:13.5px; margin:0;">외부망에서 만든 코드가 내부망 개발팀으로 넘어갈 때, 넘기기 전에 잡을 수 있는 건 다 잡아두자는 관점. 토큰 참조·접근성·구조 규약을 정적 규칙으로 박아뒀다.</p>
+    <div class="effect">
+      <strong>기대효과</strong><br>
+      · 내부망에서의 재작업·재해석 비용 감소<br>
+      · hex/px 하드코딩, <code>any</code>, 상대경로 import 같은 "옮긴 뒤 발견되는" 문제 사전 차단<br>
+      · 같은 컴포넌트를 두 번 만드는 중복을 인벤토리 매칭으로 방지
+    </div>
+  </div>
+
+</div>
+
+<div class="notebox">
+<strong>초안 단계라 유동적인 부분</strong> — 지표(재작업률 등)는 아직 기준선이 없어 수치 목표 대신 방향만 썼다. 몇 주 돌려보고 고정할 예정.
+</div>
+</section>
+
+<!-- ============================================================= -->
+<section>
+<h2>2. 저장소 구조 <span class="small">기능별로 묶어서 본 모습</span></h2>
+<p class="lead">폴더를 알파벳순이 아니라 "무슨 기능인지" 기준으로 색칠해봤다.</p>
+
+<div class="legend">
+  <span class="chip" style="--dot: var(--c-tokens);">디자인 토큰</span>
+  <span class="chip" style="--dot: var(--c-compo);">공통 컴포넌트</span>
+  <span class="chip" style="--dot: var(--c-screen);">화면 (Route)</span>
+  <span class="chip" style="--dot: var(--c-skill);">자동화 스킬/에이전트</span>
+  <span class="chip" style="--dot: var(--c-verify);">검증 스크립트</span>
+  <span class="chip" style="--dot: var(--c-docs);">문서/스토리북</span>
+</div>
+
+<div class="tree">figma-to-react/
+├── <span class="g g-tokens">design-tokens/</span>                       <span class="note"># Figma Variables 원본 (DTCG)</span>
+│   ├── color.{light,dark}-theme.tokens.json
+│   ├── color-seed.value.tokens.json        <span class="note"># 원시 팔레트, 참조 전용</span>
+│   ├── spacing / size / border-width / typo-* / effect
+│   └── manifest.json
+│
+├── scripts/
+│   ├── <span class="g g-tokens">build-tokens.mjs</span>                 <span class="note"># tokens → global.css</span>
+│   ├── <span class="g g-verify">verify-component.mjs</span>             <span class="note"># 컴포넌트 정적 규칙</span>
+│   ├── <span class="g g-verify">verify-screen.mjs</span>                <span class="note"># 화면 정적 규칙</span>
+│   ├── <span class="g g-verify">build-inventory.mjs</span>              <span class="note"># 컴포넌트 목록 DB</span>
+│   └── <span class="g g-verify">match-figma-nodes.mjs</span>            <span class="note"># Figma ↔ 인벤토리 매칭</span>
+│
+├── src/
+│   ├── <span class="g g-tokens">styles/</span>
+│   │   ├── reset.css · global.css         <span class="note"># global.css는 자동 생성</span>
+│   │   └── theme.ts                        <span class="note"># v() CSS var 헬퍼</span>
+│   │
+│   ├── <span class="g g-compo">components/</span>                       <span class="note"># 현재 14종</span>
+│   │   ├── SolidButton / OutlinedButton / GhostButton / LightSolidButton / AlphaButton
+│   │   ├── BoxTextField / Select / Checkbox
+│   │   ├── Badge / Title / Typography / Header
+│   │   ├── BottomStickyFooter / Termbox
+│   │   └── _inventory.json                 <span class="note"># 자동 생성</span>
+│   │
+│   └── <span class="g g-screen">routes/</span>
+│       └── codek-savings/terms-agree/      <span class="note"># 화면 예시</span>
+│
+├── <span class="g g-skill">.claude/</span>
+│   ├── commands/  <span class="note"># /component, /screen — 슬래시 커맨드</span>
+│   ├── agents/    <span class="note"># figma-reviewer, screen-reviewer</span>
+│   └── hooks/     <span class="note"># verify.sh — 파일 작성 직후 자동 실행</span>
+│
+├── <span class="g g-docs">.storybook/</span>                            <span class="note"># 리뷰용 문서 사이트</span>
+├── <span class="g g-docs">docs/</span>                                  <span class="note"># component-design-summary, workflow, tokens...</span>
+└── CLAUDE.md                               <span class="note"># 작업 규약 (이 세팅의 뇌)</span></div>
+
+<div class="notebox">
+<strong>이 그림에서 봐야 할 포인트</strong> — <span style="color:var(--c-tokens); font-weight:600;">보라(토큰)</span>는 단방향으로 흐르고, <span style="color:var(--c-skill); font-weight:600;">주황(스킬/에이전트)</span>은 외부 도구고, <span style="color:var(--c-verify); font-weight:600;">빨강(검증)</span>은 작성 직후 자동 실행된다. 이 세 덩어리가 서로 맞물리는 모습이 다음 섹션의 업무 흐름도.
+</div>
+</section>
+
+<!-- ============================================================= -->
+<section>
+<h2>3. 업무 흐름 <span class="small">스킬·에이전트·검증이 어디서 끼어드는지</span></h2>
+<p class="lead">도식 가운데 들어간 <span style="color:var(--c-verify); font-weight:600;">빨간 게이트</span>가 실패하면 되돌아와서 고친 뒤에만 다음으로 간다. 이 부분이 품질의 핵심.</p>
+
+<!-- ========== 컴포넌트 흐름 ========== -->
+<h3>3-1. 공통 컴포넌트 만들기 <code>/component [Name] [URL]</code></h3>
+
+<div class="flow-diagram">
+  <div class="flow-title">PL이 Figma URL 하나로 시작 → Storybook 리뷰까지</div>
+  <div class="lanes">
+
+    <div class="lane-label">PL</div>
+    <div class="lane-row">
+      <span class="node user">Figma URL 전달</span>
+      <span class="arrow">→</span>
+      <span class="stamp">(끝에서 리뷰)</span>
+    </div>
+
+    <div class="lane-label">스킬</div>
+    <div class="lane-row">
+      <span class="node" style="background:var(--c-skill-bg); border-color:#f0d3a2;">/component</span>
+      <span class="arrow">→</span>
+      <span class="node mcp">get_variable_defs</span>
+      <span class="arrow">→</span>
+      <span class="node mcp">get_image</span>
+      <span class="arrow">→</span>
+      <span class="node mcp">get_design_context</span>
+    </div>
+
+    <div class="lane-label">Claude</div>
+    <div class="lane-row">
+      <span class="node claude">KDS 설계 합의<br><span style="font-size:11px;color:var(--fg-muted);">명명·계층·사이즈·Props 순서</span></span>
+      <span class="arrow">→</span>
+      <span class="node claude">파일 5종 생성<br><span style="font-size:11px;color:var(--fg-muted);">index / types / styles / stories / README</span></span>
+    </div>
+
+    <div class="lane-label">검증</div>
+    <div class="lane-row">
+      <span class="node gate">⚡ Gate 1<br>정적 규칙 (hook)</span>
+      <span class="arrow">→</span>
+      <span class="node gate">🤖 Gate 2<br>figma-reviewer</span>
+      <span class="arrow">→</span>
+      <span class="node gate pass">✅ pass</span>
+      <span class="arrow" style="margin-left:12px">⟲</span>
+      <span class="loopback">fail → auto_fixable 즉시 수정 후 재검증</span>
+    </div>
+
+    <div class="lane-label">산출</div>
+    <div class="lane-row">
+      <span class="node out">src/components/{Name}/</span>
+      <span class="arrow">+</span>
+      <span class="node out">_inventory.json 갱신</span>
+      <span class="arrow">→</span>
+      <span class="node user">Storybook에서 PL 리뷰</span>
+    </div>
+
+  </div>
+</div>
+
+<div class="notebox">
+<strong>이 흐름이 담고 있는 동작 원리</strong> — MCP 3종(variables·image·context)을 <em>반드시</em> 다 본 뒤에야 파일을 쓴다. 과거에 metadata만 보고 조립해서 카피를 임의 변경한 사고(2026-04-23)가 있었고, 그 재발 방지가 이 순서의 이유다. Gate 2의 reviewer는 생성 코드가 아니라 <em>Figma를 다시 읽어</em> 비교한다.
+</div>
+
+<!-- ========== 화면 흐름 ========== -->
+<h3>3-2. 화면 만들기 <code>/screen [path] [URL]</code></h3>
+
+<div class="flow-diagram">
+  <div class="flow-title">화면은 "이미 있는 컴포넌트 재사용"을 먼저 판정한 뒤 조립</div>
+  <div class="lanes">
+
+    <div class="lane-label">PL</div>
+    <div class="lane-row">
+      <span class="node user">Figma URL 전달</span>
+      <span class="arrow">…</span>
+      <span class="node user">매칭 리포트 승인</span>
+      <span class="arrow">…</span>
+      <span class="node user">최종 확인</span>
+    </div>
+
+    <div class="lane-label">스킬</div>
+    <div class="lane-row">
+      <span class="node" style="background:var(--c-skill-bg); border-color:#f0d3a2;">/screen</span>
+      <span class="arrow">→</span>
+      <span class="node mcp">MCP 3종</span>
+      <span class="arrow">→</span>
+      <span class="node" style="background:var(--c-verify-bg); border-color:#f2c2ca;">match-figma-nodes</span>
+    </div>
+
+    <div class="lane-label">분류</div>
+    <div class="lane-row">
+      <span class="fork">
+        <span class="node" style="background:var(--c-screen-bg); border-color:#bbe3cb;">✅ 재사용</span>
+        <span class="node" style="background:var(--c-compo-bg); border-color:#c7d4ff;">🆕 신규 공통 → /component</span>
+        <span class="node" style="background:#f6f7f9;">🏠 화면 전용 <code>_Name.tsx</code></span>
+      </span>
+    </div>
+
+    <div class="lane-label">Claude</div>
+    <div class="lane-row">
+      <span class="node claude">route.tsx 조립<br><span style="font-size:11px;color:var(--fg-muted);">loader / action / sub components</span></span>
+    </div>
+
+    <div class="lane-label">검증</div>
+    <div class="lane-row">
+      <span class="node gate">⚡ Gate 1<br>verify-screen.mjs</span>
+      <span class="arrow">→</span>
+      <span class="node gate">🤖 Gate 2<br>screen-reviewer</span>
+      <span class="arrow">→</span>
+      <span class="node gate pass">✅ pass</span>
+      <span class="arrow" style="margin-left:12px">⟲</span>
+      <span class="loopback">카피·재사용·구조 불일치 → 재수정</span>
+    </div>
+
+    <div class="lane-label">산출</div>
+    <div class="lane-row">
+      <span class="node out">src/routes/{path}/</span>
+      <span class="arrow">→</span>
+      <span class="node user">pnpm dev 실제 동작 확인</span>
+    </div>
+
+  </div>
+</div>
+
+<div class="notebox">
+<strong>동작 원리 한 줄 요약</strong> — 화면 흐름의 핵심은 "조립 전에 인벤토리 매칭을 먼저 한다"는 것. 같은 Button을 또 만드는 걸 막기 위해 <code>_inventory.json</code>과 <code>match-figma-nodes.mjs</code>가 중간에 끼어 있다. 토큰·검증·스킬이 이 한 흐름 안에서 각자 자리를 잡는 구조.
+</div>
+</section>
+
+<!-- ============================================================= -->
+<section>
+<h2>4. 배포 <span class="small">Vercel로 가볍게 띄우는 그림</span></h2>
+<p class="lead">지금 단계에서는 "외부망 리뷰용 사이트"를 띄우는 것이 1차 목표. 실서비스 배포는 아니다.</p>
+
+<div class="deploy">
+  <div class="d-card" style="border-top: 3px solid var(--c-docs);">
+    <h4>Project A — Storybook (리뷰용)</h4>
+    <dl>
+      <dt>용도</dt><dd>컴포넌트 단위 리뷰, 디자이너/기획 공유</dd>
+      <dt>Build</dt><dd><code>pnpm build-storybook</code></dd>
+      <dt>Output</dt><dd><code>storybook-static/</code></dd>
+      <dt>보호</dt><dd>Vercel Password Protection 검토</dd>
+    </dl>
+  </div>
+  <div class="d-card" style="border-top: 3px solid var(--c-screen);">
+    <h4>Project B — SPA 프로토타입</h4>
+    <dl>
+      <dt>용도</dt><dd>화면 흐름 시연 (목업 데이터)</dd>
+      <dt>Build</dt><dd><code>pnpm build</code></dd>
+      <dt>Stack</dt><dd>Vite + React Router v7</dd>
+      <dt>환경</dt><dd>실 크레덴셜 없음 원칙</dd>
+    </dl>
+  </div>
+</div>
+
+<h3>확인 필요한 것</h3>
+<ul>
+  <li>Vercel 계정 — 회사 계정으로 갈지 / Preview Protection을 쓰려면 Pro 플랜 필요</li>
+  <li>금융권 특성상 외부 정적 호스팅 사용에 대한 보안팀 사전 승인</li>
+  <li>Storybook·SPA를 한 프로젝트에 몰지, 둘로 분리할지</li>
+</ul>
+</section>
+
+<!-- ============================================================= -->
+<section>
+<h2>5. 다음 단계 후보</h2>
+<ul>
+  <li>인벤토리의 <code>uncategorized</code> 정리 (Button 계열 5종 통폐합 검토)</li>
+  <li>reviewer 리포트에서 반복되는 <code>auto_fixable: false</code> 항목을 정적 규칙으로 승격</li>
+  <li>기준선 확보 후 "기대효과"에 실제 수치 채워 넣기</li>
+  <li>내부망에서의 동등 빌드 확인 절차 문서화</li>
+</ul>
+</section>
+
+</main>
+</body>
+</html>
