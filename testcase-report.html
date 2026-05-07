@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>KBank PC 홈페이지 테스트 결과서</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo',sans-serif;background:#F8FAFC;color:#1E293B;font-size:14px}
+.hero{background:linear-gradient(135deg,#1E3A5F 0%,#2563EB 100%);color:#fff;padding:28px 40px;display:flex;align-items:center;justify-content:space-between}
+.hero h1{font-size:20px;font-weight:700}
+.hero .meta{font-size:12px;opacity:.75;margin-top:4px}
+.excel-btn{background:#fff;color:#2563EB;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.excel-btn:hover{background:#EFF6FF}
+.summary{display:flex;gap:12px;padding:20px 40px;background:#fff;border-bottom:1px solid #E2E8F0;flex-wrap:wrap}
+.stat-card{flex:1;min-width:130px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 18px;text-align:center}
+.stat-card .val{font-size:26px;font-weight:700;color:#1E3A5F}
+.stat-card .lbl{font-size:12px;color:#64748B;margin-top:3px}
+.stat-card.pass .val{color:#16A34A}
+.stat-card.fail .val{color:#DC2626}
+.stat-card.rate .val{color:#2563EB}
+.page-tabs{display:flex;background:#fff;border-bottom:2px solid #E2E8F0;padding:0 40px;overflow-x:auto}
+.page-tab{padding:13px 18px;cursor:pointer;font-size:14px;font-weight:500;color:#64748B;border-bottom:2px solid transparent;white-space:nowrap;margin-bottom:-2px;transition:all .15s}
+.page-tab.active{color:#2563EB;border-bottom-color:#2563EB;font-weight:600}
+.page-tab:hover:not(.active){color:#334155}
+.content{padding:20px 40px;max-width:1400px}
+.page-panel{display:none}
+.page-panel.active{display:block}
+.sub-tabs{display:flex;gap:2px;margin-bottom:16px;background:#F1F5F9;border-radius:8px;padding:4px;width:fit-content}
+.sub-tab{padding:7px 18px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:#64748B;transition:all .15s}
+.sub-tab.active{background:#fff;color:#2563EB;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.sub-panel{display:none}
+.sub-panel.active{display:block}
+.section-card{background:#fff;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:8px;overflow:hidden}
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:#F8FAFC}
+.section-head:hover{background:#F1F5F9}
+.section-title{font-weight:600;font-size:13px;color:#1E3A5F}
+.section-meta{display:flex;align-items:center;gap:6px}
+.badge{font-size:11px;padding:2px 7px;border-radius:20px;font-weight:600}
+.badge.pass{background:#DCFCE7;color:#166534}
+.badge.fail{background:#FEE2E2;color:#991B1B}
+.badge.total{background:#EDE9FE;color:#5B21B6}
+.chevron{font-size:11px;color:#94A3B8;transition:transform .2s}
+.section-body{display:none;padding:0 16px 12px}
+.section-card.open .section-body{display:block}
+.section-card.open .chevron{transform:rotate(180deg)}
+.test-row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #F1F5F9;gap:8px}
+.test-row:last-child{border-bottom:none}
+.test-id{font-family:monospace;font-size:11px;color:#94A3B8;width:46px;flex-shrink:0}
+.test-name{flex:1;font-size:12px;color:#374151}
+.tag-badge{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;white-space:nowrap}
+.tag-표시{background:#F1F5F9;color:#334155}
+.tag-상태{background:#DBEAFE;color:#1D4ED8}
+.tag-콘텐츠{background:#EDE9FE;color:#5B21B6}
+.tag-접근성{background:#D1FAE5;color:#065F46}
+.tag-버튼{background:#FEF3C7;color:#92400E}
+.tag-모달{background:#F3E8FF;color:#6B21A8}
+.tag-드롭다운{background:#CCFBF1;color:#0F766E}
+.tag-아코디언{background:#FEF9C3;color:#854D0E}
+.tag-검색{background:#FCE7F3;color:#9D174D}
+.tag-푸터{background:#F0FDF4;color:#14532D}
+.status-badge{font-size:11px;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap}
+.status-PASS{background:#DCFCE7;color:#166534}
+.status-FAIL{background:#FEE2E2;color:#991B1B}
+.status-SKIP{background:#FEF9C3;color:#854D0E}
+.type-badge{font-size:10px;padding:2px 5px;border-radius:4px;font-weight:600;white-space:nowrap}
+.type-COMMON{background:#DBEAFE;color:#1E40AF}
+.type-고유{background:#F3E8FF;color:#5B21B6}
+.tc-table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #E2E8F0}
+.tc-table th{background:#334155;color:#fff;padding:9px 12px;text-align:left;font-size:12px;font-weight:600}
+.tc-table td{padding:8px 12px;font-size:12px;border-bottom:1px solid #F1F5F9}
+.tc-table tr:last-child td{border-bottom:none}
+.tc-table tr:hover td{background:#F8FAFC}
+.chart-section{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:18px;margin-top:20px}
+.chart-title{font-weight:600;color:#1E3A5F;margin-bottom:14px;font-size:14px}
+.chart-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.chart-label{width:100px;font-size:12px;color:#374151;text-align:right;flex-shrink:0}
+.chart-bar-wrap{flex:1;background:#F1F5F9;border-radius:4px;height:24px;overflow:hidden}
+.chart-bar{height:100%;background:linear-gradient(90deg,#2563EB,#60A5FA);border-radius:4px;display:flex;align-items:center;padding:0 8px;min-width:50px}
+.chart-pct{font-size:11px;color:#fff;font-weight:600}
+.chart-count{font-size:12px;color:#64748B;width:65px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div>
+    <div class="meta" id="hero-meta"></div>
+    <h1>KBank PC 홈페이지 테스트 결과서</h1>
+  </div>
+  <button class="excel-btn" onclick="exportExcel()">&#8595; Excel 다운로드</button>
+</div>
+<div class="summary" id="summary-area"></div>
+<div class="page-tabs" id="page-tabs"></div>
+<div class="content" id="content-area"></div>
+
+<script>
+var TODAY = '2026-05-07';
+var PAGES_META = [
+  {id:'home',             name:'메인 홈',          url:'/web/web-home/home/main',           spec:'20260506-122725-home.spec.ts',              lastRun:'2026-05-06',hasCommon:false},
+  {id:'about',            name:'은행소개',         url:'/web/about/kbank/info',             spec:'20260507-111042-about.spec.ts',             lastRun:'2026-05-07',hasCommon:true},
+  {id:'product',          name:'상품안내',         url:'/web/product/deposit/list',         spec:'20260506-165358-product.spec.ts',           lastRun:'2026-05-06',hasCommon:true},
+  {id:'blog',             name:'새소식블로그',     url:'/web/news-blog/article/list',       spec:'20260507-111042-blog.spec.ts',              lastRun:'2026-05-07',hasCommon:true},
+  {id:'customer',         name:'고객센터',         url:'/web/customer/faq/list',            spec:'20260507-111042-customer.spec.ts',          lastRun:'2026-05-07',hasCommon:true},
+  {id:'policy',           name:'고객정보보호정책', url:'/web/common/policy/info',           spec:'20260507-111042-policy.spec.ts',            lastRun:'2026-05-07',hasCommon:true},
+  {id:'protected-product',name:'보호금융상품등록부',url:'/web/common/protected-product/info',spec:'20260507-111042-protected-product.spec.ts',lastRun:'2026-05-07',hasCommon:true},
+];
+var COMMON_TESTS = [
+  {id:'C-1', name:'헤더가 표시되는지 확인',tag:'표시',status:'PASS'},
+  {id:'C-2', name:'케이뱅크 로고(SVG)가 표시되는지 확인',tag:'표시',status:'PASS'},
+  {id:'C-3', name:'스크롤 후 헤더가 상단에 고정되는지 확인',tag:'상태',status:'PASS'},
+  {id:'C-4', name:'헤더 opacity가 1인지 확인',tag:'상태',status:'PASS'},
+  {id:'C-5', name:'GNB "은행소개" 메뉴가 표시되는지 확인',tag:'표시',status:'PASS'},
+  {id:'C-6', name:'GNB "새소식블로그" 메뉴가 표시되는지 확인',tag:'표시',status:'PASS'},
+  {id:'C-7', name:'GNB "고객센터" 메뉴가 표시되는지 확인',tag:'표시',status:'PASS'},
+  {id:'C-8', name:'GNB "인재영입" 메뉴가 표시되는지 확인',tag:'표시',status:'PASS'},
+  {id:'C-9', name:'GNB "기업뱅킹" 메뉴가 표시되는지 확인',tag:'표시',status:'PASS'},
+  {id:'C-10',name:'"은행소개" hover 시 드롭다운 표시 확인',tag:'드롭다운',status:'PASS'},
+  {id:'C-11',name:'"새소식블로그" hover 시 드롭다운 표시 확인',tag:'드롭다운',status:'PASS'},
+  {id:'C-12',name:'"고객센터" hover 시 드롭다운 표시 확인',tag:'드롭다운',status:'PASS'},
+  {id:'C-13',name:'앱 다운로드 버튼 표시 및 활성화 확인',tag:'버튼',status:'PASS'},
+  {id:'C-14',name:'앱 다운로드 클릭 시 모달이 열리는지 확인',tag:'모달',status:'PASS'},
+  {id:'C-15',name:'모달 닫기(X) 버튼으로 모달이 닫히는지 확인',tag:'모달',status:'PASS'},
+];
+var PAGE_SECTIONS = {};
+PAGE_SECTIONS['home'] = [
+  {id:'1',name:'페이지 기본 로딩',tests:[
+    {id:'1-1',name:'페이지 타이틀이 "케이뱅크 메인 페이지"인지 확인',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'URL이 /web/web-home/home/main을 포함하는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'헤더(고정 div)가 렌더링되는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'헤더 top이 0~10px이고 height가 50~70px 범위인지 확인',tag:'상태',status:'PASS'},
+    {id:'1-5',name:'헤더에 SVG 로고가 1개 이상 존재하는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-6',name:'히어로 영역에 "나의 금융생활이" 텍스트가 표시되는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-7',name:'히어로 영역에 "즐거움으로" 텍스트가 표시되는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-8',name:'히어로 영역에 "가득해지도록." 텍스트가 표시되는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-9',name:'페이지에 "SPA-STG" 환경 마커가 노출되는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-10',name:'빌드 해시(8자리 hex 문자열)가 페이지에 노출되는지 확인',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'Skip 링크 (접근성)',tests:[
+    {id:'2-1',name:'"본문 바로가기" 링크가 존재(href=#main-content)',tag:'접근성',status:'PASS'},
+    {id:'2-2',name:'"주메뉴 바로가기" 링크가 존재(href=#gnb)',tag:'접근성',status:'PASS'},
+  ]},
+  {id:'3',name:'GNB 1차 메뉴 표시',tests:[
+    {id:'3-1',name:'헤더에 "은행소개" 링크가 표시 (href=/web/about/kbank/info)',tag:'표시',status:'PASS'},
+    {id:'3-2',name:'헤더에 "예적금" 링크가 표시 (href=/web/product/deposit/list)',tag:'표시',status:'PASS'},
+    {id:'3-3',name:'헤더에 "대출" 링크가 표시 (href=/web/product/loan/list)',tag:'표시',status:'PASS'},
+    {id:'3-4',name:'헤더에 "카드" 링크가 표시 (href=/web/product/card/list)',tag:'표시',status:'PASS'},
+    {id:'3-5',name:'헤더에 "사장님" 링크가 표시 (href=/web/product/soho/list)',tag:'표시',status:'PASS'},
+    {id:'3-6',name:'헤더에 "서비스" 링크가 표시 (href=/web/product/service/list)',tag:'표시',status:'PASS'},
+    {id:'3-7',name:'헤더에 "투자" 링크가 표시 (href=/web/product/invest/list)',tag:'표시',status:'PASS'},
+    {id:'3-8',name:'헤더에 "새소식블로그" 링크가 표시 (href=/web/news-blog/article/list?tab=all)',tag:'표시',status:'PASS'},
+    {id:'3-9',name:'헤더에 "고객센터" 링크가 표시 (href=/web/customer/faq/list)',tag:'표시',status:'PASS'},
+    {id:'3-10',name:'헤더에 "인재영입" 외부 링크가 표시 (href=https://recruit.kbanknow.com)',tag:'표시',status:'PASS'},
+    {id:'3-11',name:'헤더에 "기업뱅킹" 외부 링크가 표시 (href=https://biz.kbanknow.com)',tag:'표시',status:'PASS'},
+    {id:'3-12',name:'헤더에 "앱 다운로드" 버튼이 표시되는지 확인',tag:'표시',status:'PASS'},
+    {id:'3-13',name:'"앱 다운로드" 버튼이 enabled 상태인지 확인',tag:'버튼',status:'PASS'},
+  ]},
+  {id:'4',name:'GNB 드롭다운 — 은행소개',tests:[
+    {id:'4-1',name:'은행소개 hover 시 "비전" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-2',name:'은행소개 hover 시 "연혁" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-3',name:'은행소개 hover 시 "주주사소개" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-4',name:'은행소개 hover 시 "오시는길" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-5',name:'은행소개 hover 시 "브랜드 스토리" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-6',name:'은행소개 hover 시 "리소스 센터" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-7',name:'은행소개 hover 시 "총칙" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-8',name:'은행소개 hover 시 "윤리강령" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-9',name:'은행소개 hover 시 "행동강령" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-10',name:'은행소개 hover 시 "준법제도" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-11',name:'은행소개 hover 시 "경영공시" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-12',name:'은행소개 hover 시 "Annual Report" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-13',name:'은행소개 hover 시 "공지사항" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-14',name:'은행소개 hover 시 "사업공고" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'5',name:'GNB 드롭다운 — 예적금',tests:[
+    {id:'5-1',name:'예적금 hover 시 "데굴데굴농장" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-2',name:'예적금 hover 시 "코드K 정기예금" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-3',name:'예적금 hover 시 "궁금한 적금" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-4',name:'예적금 hover 시 "주거래우대 자유적금" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-5',name:'예적금 hover 시 "챌린지박스" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-6',name:'예적금 hover 시 "코드K 자유적금" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-7',name:'예적금 hover 시 "플러스박스" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-8',name:'예적금 hover 시 "기분통장" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-9',name:'예적금 hover 시 "생활통장" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-10',name:'예적금 hover 시 "모임통장" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-11',name:'예적금 hover 시 "사장님통장" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-12',name:'예적금 hover 시 "ALPHA" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'6',name:'GNB 드롭다운 — 대출',tests:[
+    {id:'6-1',name:'대출 hover 시 "아낌e보금자리론" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-2',name:'대출 hover 시 "아파트담보대출" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-3',name:'대출 hover 시 "전월세보증금대출" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-4',name:'대출 hover 시 "예금 적금 담보대출" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-5',name:'대출 hover 시 "신용대출 알아보기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-6',name:'대출 hover 시 "신용대출 갈아타기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-7',name:'대출 hover 시 "사장님대출 맞춤조회" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-8',name:'대출 hover 시 "서울시 안심통장" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'7',name:'GNB 드롭다운 — 카드',tests:[
+    {id:'7-1',name:'카드 hover 시 "ONE 체크카드(K-패스)" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-2',name:'카드 hover 시 "플러스 체크카드" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-3',name:'카드 hover 시 "KT멤버십 더블혜택 체크카드" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-4',name:'카드 hover 시 "모임 체크카드" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-5',name:'카드 hover 시 "현대카드 M" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-6',name:'카드 hover 시 "신용카드 만들기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-7',name:'카드 hover 시 "케이뱅크 알파카드" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'8',name:'GNB 드롭다운 — 사장님',tests:[
+    {id:'8-1',name:'사장님 hover 시 "사장님대출 맞춤조회" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-2',name:'사장님 hover 시 "사장님 부동산 담보대출" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-3',name:'사장님 hover 시 "사장님통장" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-4',name:'사장님 hover 시 "거래처 정보조회" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-5',name:'사장님 hover 시 "사장님 경영컨설팅" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-6',name:'사장님 hover 시 "맞춤 정책자금 받기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-7',name:'사장님 hover 시 "AI 세무상담" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-8',name:'사장님 hover 시 "사장님 신용리포트" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-9',name:'사장님 hover 시 "종합소득세 돌려받기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'9',name:'GNB 드롭다운 — 서비스',tests:[
+    {id:'9-1',name:'서비스 hover 시 "해외송금" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-2',name:'서비스 hover 시 "환전" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-3',name:'서비스 hover 시 "전셋집 안심스캔" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-4',name:'서비스 hover 시 "HF전세지킴보증" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-5',name:'서비스 hover 시 "우리집 변동알림" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-6',name:'서비스 hover 시 "AI 퀴즈 챌린지" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-7',name:'서비스 hover 시 "나의 혜택" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-8',name:'서비스 hover 시 "쿠폰함" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-9',name:'서비스 hover 시 "돈나무 키우기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-10',name:'서비스 hover 시 "내 신용관리" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'9-11',name:'서비스 hover 시 "내 DSR 계산기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'10',name:'GNB 드롭다운 — 투자',tests:[
+    {id:'10-1',name:'투자 hover 시 "미국 국채" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-2',name:'투자 hover 시 "미래에셋증권" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-3',name:'투자 hover 시 "한국투자증권" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-4',name:'투자 hover 시 "삼성증권" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-5',name:'투자 hover 시 "KB증권" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-6',name:'투자 hover 시 "연금저축계좌" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-7',name:'투자 hover 시 "주식 둘러보기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-8',name:'투자 hover 시 "투자 캘린더" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-9',name:'투자 hover 시 "공모주 메이트" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-10',name:'투자 hover 시 "주식 모으기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-11',name:'투자 hover 시 "금(KRX) 투자" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'10-12',name:'투자 hover 시 "가상자산 모으기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'11',name:'GNB 드롭다운 — 새소식블로그',tests:[
+    {id:'11-1',name:'새소식블로그 hover 시 "전체" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'11-2',name:'새소식블로그 hover 시 "테크" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'11-3',name:'새소식블로그 hover 시 "비하인드" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'11-4',name:'새소식블로그 hover 시 "케뱅스토리" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'11-5',name:'새소식블로그 hover 시 "컬쳐" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'11-6',name:'새소식블로그 hover 시 "팀" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'12',name:'GNB 드롭다운 — 고객센터',tests:[
+    {id:'12-1',name:'고객센터 hover 시 "자주 묻는 질문" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-2',name:'고객센터 hover 시 "전화상담" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-3',name:'고객센터 hover 시 "1:1문의" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-4',name:'고객센터 hover 시 "원격지원" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-5',name:'고객센터 hover 시 "이용시간 안내" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-6',name:'고객센터 hover 시 "수수료 안내" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-7',name:'고객센터 hover 시 "자동화기기(CD/ATM) 이용안내" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-8',name:'고객센터 hover 시 "금리안내" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-9',name:'고객센터 hover 시 "소비자보호체계" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-10',name:'고객센터 hover 시 "전자민원" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-11',name:'고객센터 hover 시 "대응체계" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-12',name:'고객센터 hover 시 "자료실" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-13',name:'고객센터 hover 시 "상품공시실" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-14',name:'고객센터 hover 시 "증명서 확인" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-15',name:'고객센터 hover 시 "인증서 내보내기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'12-16',name:'고객센터 hover 시 "인증서 가져오기" 항목 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'13',name:'앱 다운로드 모달',tests:[
+    {id:'13-1',name:'"앱 다운로드" 클릭 시 "지금 케이뱅크 앱을 사용해 보세요!" 표시',tag:'모달',status:'PASS'},
+    {id:'13-2',name:'모달에 "더 많은 혜택과 다양한 서비스를 편리하게 이용하실 수 있습니다." 표시',tag:'모달',status:'PASS'},
+    {id:'13-3',name:'모달에 "스마트폰의 기본 카메라" 안내 텍스트 표시',tag:'모달',status:'PASS'},
+    {id:'13-4',name:'모달에 "확인" 버튼 표시',tag:'모달',status:'PASS'},
+    {id:'13-5',name:'닫기 버튼에 aria-label="모달 다이얼로그 닫기"가 존재',tag:'접근성',status:'PASS'},
+    {id:'13-6',name:'X 버튼 클릭 시 모달이 닫힘',tag:'모달',status:'PASS'},
+    {id:'13-7',name:'"확인" 버튼 클릭 시 모달이 닫힘',tag:'모달',status:'PASS'},
+  ]},
+  {id:'14',name:'1차 메뉴 클릭 — 페이지 이동',tests:[
+    {id:'14-1',name:'"은행소개" 클릭 시 /web/about/kbank/info 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-2',name:'은행소개 → 뒤로가기 시 홈 페이지가 복원',tag:'표시',status:'PASS'},
+    {id:'14-3',name:'"예적금" 클릭 시 /web/product/deposit/list 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-4',name:'"대출" 클릭 시 /web/product/loan/list 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-5',name:'"카드" 클릭 시 /web/product/card/list 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-6',name:'"사장님" 클릭 시 /web/product/soho/list 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-7',name:'"서비스" 클릭 시 /web/product/service/list 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-8',name:'"투자" 클릭 시 /web/product/invest/list 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-9',name:'"새소식블로그" 클릭 시 /web/news-blog/article/list 로 이동',tag:'표시',status:'PASS'},
+    {id:'14-10',name:'"고객센터" 클릭 시 /web/customer/faq/list 로 이동',tag:'표시',status:'PASS'},
+  ]},
+  {id:'15',name:'외부 도메인 GNB',tests:[
+    {id:'15-1',name:'"인재영입" 링크 href가 https://recruit.kbanknow.com 포함',tag:'표시',status:'PASS'},
+    {id:'15-2',name:'"기업뱅킹" 링크 href가 https://biz.kbanknow.com 포함',tag:'표시',status:'PASS'},
+  ]},
+  {id:'16',name:'헤더 고정 & 레이아웃',tests:[
+    {id:'16-1',name:'헤더(fixed) top이 0~10px 범위인지 확인',tag:'상태',status:'PASS'},
+    {id:'16-2',name:'헤더 height가 50~70px 범위인지 확인',tag:'상태',status:'PASS'},
+    {id:'16-3',name:'페이지 전체 높이가 1000px 미만(스크롤 없는 단일 화면)',tag:'상태',status:'PASS'},
+    {id:'16-4',name:'뷰포트 1280px에서 GNB 9개 메뉴가 한 줄에 모두 표시',tag:'표시',status:'PASS'},
+    {id:'16-5',name:'mouse.wheel 후에도 scrollY가 0이며 헤더 top 유지',tag:'상태',status:'PASS'},
+  ]},
+  {id:'17',name:'접근성',tests:[
+    {id:'17-1',name:'"본문 바로가기" / "주메뉴 바로가기" skip link가 페이지 최상단에 존재',tag:'접근성',status:'PASS'},
+    {id:'17-2',name:'헤더에 식별 가능한 SVG 로고가 1개 이상 존재',tag:'접근성',status:'PASS'},
+    {id:'17-3',name:'모든 GNB 1차 메뉴가 키보드 접근 가능한 a/button 태그',tag:'접근성',status:'PASS'},
+    {id:'17-4',name:'앱 다운로드 모달 닫기 버튼에 aria-label="모달 다이얼로그 닫기" 존재',tag:'접근성',status:'PASS'},
+  ]},
+  {id:'18',name:'SPA 환경 표시 (디버그)',tests:[
+    {id:'18-1',name:'페이지에 "SPA-STG" 환경 마커가 노출',tag:'표시',status:'PASS'},
+    {id:'18-2',name:'빌드 해시(8자리 hex 문자열)가 노출',tag:'표시',status:'PASS'},
+    {id:'18-3',name:'디버그 영역에 시계 텍스트(M/D/YYYY, h:mm:ss AM/PM)가 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'19',name:'페이지 안정성',tests:[
+    {id:'19-1',name:'domcontentloaded 후 5초 이내 헤더 + 히어로 텍스트 노출',tag:'상태',status:'PASS'},
+    {id:'19-2',name:'새로고침 후에도 동일한 GNB 1차 메뉴 9개 노출',tag:'상태',status:'PASS'},
+    {id:'19-3',name:'페이지에 <footer> 태그가 존재하지 않음',tag:'상태',status:'PASS'},
+    {id:'19-4',name:'페이지에 <img> 태그가 0개',tag:'상태',status:'PASS'},
+  ]},
+];
+PAGE_SECTIONS['about'] = [
+  {id:'1',name:'페이지 기본 로딩',tests:[
+    {id:'1-1',name:'URL이 /web/about/kbank/info를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'헤더(고정 div)가 렌더링',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'role="tablist" 컨테이너 존재',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'페이지 하단에 <footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-5',name:'페이지 타이틀이 "디테일 페이지에요"',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'탭 네비게이션 (4개)',tests:[
+    {id:'2-1',name:'초기 로딩 시 "비전" 탭이 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'4개 탭(비전/연혁/주주사 소개/오시는길) 모두 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"연혁" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-4',name:'"주주사 소개" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-5',name:'"오시는길" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-6',name:'"비전" 탭 복귀 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'3',name:'비전 탭 콘텐츠',tests:[
+    {id:'3-1',name:'"케이뱅크" 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'3-2',name:'"혁신과 기술로 더 나은 금융생활을" 슬로건 표시',tag:'표시',status:'PASS'},
+    {id:'3-3',name:'"대한민국 제1호 인터넷전문은행" 표시',tag:'표시',status:'PASS'},
+    {id:'3-4',name:'"케이뱅크는 국내 1호 인터넷전문은행으로" 본문 표시',tag:'표시',status:'PASS'},
+    {id:'3-5',name:'"‘생활 속의 은행’" 비전 키워드 표시',tag:'표시',status:'PASS'},
+    {id:'3-6',name:'"‘혁신투자 허브 은행’" 비전 키워드 표시',tag:'표시',status:'PASS'},
+    {id:'3-7',name:'"‘최신 기술 선도 은행’" 비전 키워드 표시',tag:'표시',status:'PASS'},
+    {id:'3-8',name:'"(Tech Leading Bank)" 영문 부제 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'4',name:'푸터',tests:[
+    {id:'4-1',name:'<footer>가 표시',tag:'푸터',status:'PASS'},
+    {id:'4-2',name:'은행 전화번호 "1522-1000" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-3',name:'카드 전화번호 "1522-1155" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-4',name:'해외 전화번호 "82-2-3778-9111" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-5',name:'"개인정보처리방침" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-6',name:'"신용정보활용체제" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-7',name:'"경영공시" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-8',name:'"준법제보" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-9',name:'"전자민원" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-10',name:'"상품공시실" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-11',name:'"보호금융상품등록부" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-12',name:'"금융소비자보호" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-13',name:'인증범위 안내 텍스트 표시',tag:'푸터',status:'PASS'},
+  ]},
+  {id:'5',name:'푸터 메뉴 클릭 → 페이지 이동',tests:[
+    {id:'5-1',name:'"개인정보처리방침" 클릭 시 /web/common/policy/info 로 이동',tag:'이동',status:'PASS'},
+    {id:'5-2',name:'"신용정보활용체제" 클릭 시 /web/common/policy/info 로 이동',tag:'이동',status:'PASS'},
+    {id:'5-3',name:'"경영공시" 클릭 시 /web/about/ir/list 로 이동',tag:'이동',status:'PASS'},
+    {id:'5-4',name:'"전자민원" 클릭 시 /web/customer/online-complaint/customer-type-select 로 이동',tag:'이동',status:'PASS'},
+    {id:'5-5',name:'"상품공시실" 클릭 시 /web/customer/product-noti/noti 로 이동',tag:'이동',status:'PASS'},
+    {id:'5-6',name:'"보호금융상품등록부" 클릭 시 /web/common/protected-product/info 로 이동',tag:'이동',status:'PASS'},
+    {id:'5-7',name:'"금융소비자보호" 클릭 시 /web/customer/protection/system 로 이동',tag:'이동',status:'PASS'},
+  ]},
+];
+PAGE_SECTIONS['product'] = [
+  {id:'1',name:'페이지 기본 로딩',tests:[
+    {id:'1-1',name:'URL이 /web/product/deposit/list를 포함하는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'헤더(고정 div)가 렌더링되는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'role="tablist" 컨테이너가 존재하는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'페이지 하단에 <footer> 태그가 존재하는지 확인',tag:'표시',status:'PASS'},
+    {id:'1-5',name:'예적금 카테고리 라벨 "저축"이 표시되는지 확인',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'상품 탭 네비게이션',tests:[
+    {id:'2-1',name:'초기 로딩 시 "예적금" 탭이 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'6개 탭(예적금/대출/카드/사장님/서비스/투자) 모두 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"대출" 탭 클릭 시 URL이 /web/product/loan/list로 이동',tag:'콘텐츠',status:'PASS'},
+    {id:'2-4',name:'"카드" 탭 클릭 시 URL이 /web/product/card/list로 이동',tag:'콘텐츠',status:'PASS'},
+    {id:'2-5',name:'"사장님" 탭 클릭 시 URL이 /web/product/soho/list로 이동',tag:'콘텐츠',status:'PASS'},
+    {id:'2-6',name:'"서비스" 탭 클릭 시 URL이 /web/product/service/list로 이동',tag:'콘텐츠',status:'PASS'},
+    {id:'2-7',name:'"투자" 탭 클릭 시 URL이 /web/product/invest/list로 이동',tag:'콘텐츠',status:'PASS'},
+    {id:'2-8',name:'"예적금" 탭 복귀 시 URL이 /web/product/deposit/list로 복원',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'3',name:'예적금 탭 — 상품 목록',tests:[
+    {id:'3-1',name:'"데굴데굴 농장" 상품명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-2',name:'"매달 이자가 굴러오는 적금" 설명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-3',name:'"코드K 정기예금" 상품명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-4',name:'"복잡한 조건없이 간편한 예금" 설명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-5',name:'"궁금한 적금" 상품명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-6',name:'"매일 열어보는 오늘의 스토리와 금리" 설명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-7',name:'"주거래우대 자유적금" 상품명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-8',name:'"넉넉한 납입액과 높은 금리" 설명이 표시',tag:'표시',status:'PASS'},
+    {id:'3-9',name:'"상세보기" 버튼이 1개 이상 존재하고 enabled 상태',tag:'버튼',status:'PASS'},
+  ]},
+  {id:'4',name:'대출 탭 — 상품 목록',tests:[
+    {id:'4-1',name:'"아낌e보금자리론" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-2',name:'"대출기간 동안 변함없는 금리" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-3',name:'"아파트담보대출" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-4',name:'"구입,반환,생활자금은 물론 갈아타기까지!" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-5',name:'"전월세보증금 대출" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-6',name:'"예금 · 적금 담보대출" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-7',name:'"해지없이 잔액의 95%만큼 빌리는 담보대출" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'5',name:'카드 탭 — 상품 목록',tests:[
+    {id:'5-1',name:'"ONE 체크카드(K-패스)" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-2',name:'"내맘대로 골라받는 역대급 혜택" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-3',name:'"플러스 체크카드" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-4',name:'"무제한 기본 캐시백 + 최대 3만원 추가" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-5',name:'"KT멤버십 더블혜택 체크카드" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-6',name:'"KT멤버십 캐시백에 통신비 할인까지!" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-7',name:'"모임 체크카드" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'6',name:'사장님 탭 — 상품 목록',tests:[
+    {id:'6-1',name:'"사장님 부동산 담보대출" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-2',name:'"부동산을 소유한 사장님을 위한 대출" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-3',name:'"사장님대출 갈아타기" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-4',name:'"낮은 금리로 갈아타고 이자 줄이기" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-5',name:'"사장님대출 맞춤조회" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-6',name:'"신용대출부터 보증서대출까지 한 번에 알아보기" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-7',name:'"서울시 안심통장" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'7',name:'서비스 탭 — 상품 목록',tests:[
+    {id:'7-1',name:'"해외송금" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-2',name:'"전 세계 어디든 안전하고 빠르게" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-3',name:'"환전" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-4',name:'"최대 90% 우대받고 환전하기" 설명이 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'8',name:'투자 탭 — 상품 목록',tests:[
+    {id:'8-1',name:'"미국 국채" 상품명이 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'8-2',name:'"한국투자증권" 제휴사 텍스트가 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'9',name:'상세보기 버튼 — 클릭/이동/복원',tests:[
+    {id:'9-1',name:'예적금 탭에서 "상세보기" 버튼이 1개 이상 존재',tag:'표시',status:'PASS'},
+    {id:'9-2',name:'"상세보기" 버튼이 enabled 상태',tag:'버튼',status:'PASS'},
+    {id:'9-3',name:'첫 "상세보기" 클릭 시 /web/product/deposit/ 상세 페이지로 이동',tag:'이동',status:'PASS'},
+    {id:'9-4',name:'상세 페이지에서 뒤로가기 시 /web/product/deposit/list 가 복원',tag:'복원',status:'PASS'},
+  ]},
+  {id:'10',name:'URL 직접 진입 검증',tests:[
+    {id:'10-1',name:'/web/product/deposit/list 직접 진입 시 "예적금" 탭 활성',tag:'표시',status:'PASS'},
+    {id:'10-2',name:'/web/product/loan/list 직접 진입 시 "대출" 탭 활성',tag:'표시',status:'PASS'},
+    {id:'10-3',name:'/web/product/card/list 직접 진입 시 "카드" 탭 활성',tag:'표시',status:'PASS'},
+  ]},
+  {id:'11',name:'이미지 접근성',tests:[
+    {id:'11-1',name:'"ONE 체크카드(K-패스)" 이미지 alt 존재',tag:'접근성',status:'PASS'},
+    {id:'11-2',name:'"플러스 체크카드" 이미지 alt 존재',tag:'접근성',status:'PASS'},
+    {id:'11-3',name:'"KT멤버십 더블혜택 체크카드" 이미지 alt 존재',tag:'접근성',status:'PASS'},
+    {id:'11-4',name:'"모임 체크카드" 이미지 alt 존재',tag:'접근성',status:'PASS'},
+    {id:'11-5',name:'페이지 내 모든 이미지에 빈 alt 속성이 없는지 확인',tag:'접근성',status:'PASS'},
+  ]},
+  {id:'12',name:'푸터',tests:[
+    {id:'12-1',name:'<footer> 태그가 페이지 하단에 표시',tag:'푸터',status:'PASS'},
+    {id:'12-2',name:'푸터에 "고객센터" 텍스트가 표시',tag:'푸터',status:'PASS'},
+    {id:'12-3',name:'은행 전화번호 "1522-1000"이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-4',name:'카드 전화번호 "1522-1155"가 표시',tag:'푸터',status:'PASS'},
+    {id:'12-5',name:'해외 전화번호 "82-2-3778-9111"이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-6',name:'"개인정보처리방침" 항목이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-7',name:'"신용정보활용체제" 항목이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-8',name:'"경영공시" 항목이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-9',name:'"전자민원" 항목이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-10',name:'"상품공시실" 항목이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-11',name:'"보호금융상품등록부" 항목이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-12',name:'"금융소비자보호" 항목이 표시',tag:'푸터',status:'PASS'},
+    {id:'12-13',name:'"케이뱅크 기업뱅킹" 링크가 표시',tag:'푸터',status:'PASS'},
+    {id:'12-14',name:'"인증범위 : 전자금융서비스(모바일) 및 홈페이지" 텍스트가 표시',tag:'푸터',status:'PASS'},
+    {id:'12-15',name:'유효기간 "2025.05.27 ~ 2028.05.26" 표기 표시',tag:'푸터',status:'PASS'},
+  ]},
+  {id:'13',name:'상세 페이지 — 데굴데굴 농장 (예적금)',tests:[
+    {id:'13-1',name:'URL이 /web/product/deposit/rolling-farm 인지 확인',tag:'표시',status:'PASS'},
+    {id:'13-2',name:'상품명 "데굴데굴 농장" 표시',tag:'표시',status:'PASS'},
+    {id:'13-3',name:'캐치프레이즈 "이자 수확하고, 다시 심어 내 돈을 굴려요" 표시',tag:'표시',status:'PASS'},
+    {id:'13-4',name:'부제목 "매달 이자가 굴러오는 적금" 표시',tag:'표시',status:'PASS'},
+    {id:'13-5',name:'금리 "기본 연 2.50%" 표시',tag:'표시',status:'PASS'},
+    {id:'13-6',name:'납입금 "월 최대 1천만원" 표시',tag:'표시',status:'PASS'},
+    {id:'13-7',name:'가입기간 "6개월, 12개월" 표시',tag:'표시',status:'PASS'},
+    {id:'13-8',name:'섹션 라벨 "상품상세" 표시',tag:'표시',status:'PASS'},
+    {id:'13-9',name:'섹션 라벨 "금리안내" 표시',tag:'표시',status:'PASS'},
+    {id:'13-10',name:'섹션 라벨 "이용안내" 표시',tag:'표시',status:'PASS'},
+    {id:'13-11',name:'섹션 라벨 "약관 및 상품설명서" 표시',tag:'표시',status:'PASS'},
+    {id:'13-12',name:'"목록 돌아가기" 버튼 표시 + enabled',tag:'버튼',status:'PASS'},
+    {id:'13-13',name:'"목록 돌아가기" 클릭 시 /web/product/deposit/list 로 복원',tag:'이동',status:'PASS'},
+    {id:'13-14',name:'푸터에 "1522-1000" 전화번호 표시',tag:'푸터',status:'PASS'},
+  ]},
+  {id:'14',name:'상세 페이지 — 아낌e보금자리론 (대출)',tests:[
+    {id:'14-1',name:'URL이 /web/product/loan/hf_mortgage 인지 확인',tag:'표시',status:'PASS'},
+    {id:'14-2',name:'상품명 "아낌e보금자리론" 표시',tag:'표시',status:'PASS'},
+    {id:'14-3',name:'캐치프레이즈 "대출기간 동안 변함없는 금리" 표시',tag:'표시',status:'PASS'},
+    {id:'14-4',name:'최대한도 "4억 2,000만원" 표시',tag:'표시',status:'PASS'},
+    {id:'14-5',name:'금리 "연 1.55%~4.00%" 표시',tag:'표시',status:'PASS'},
+    {id:'14-6',name:'신청 단계 "3단계로 간편하게 신청하세요!" 표시',tag:'표시',status:'PASS'},
+    {id:'14-7',name:'외부 링크 "한국주택금융공사 바로가기" 표시',tag:'표시',status:'PASS'},
+    {id:'14-8',name:'단계 텍스트 "케이뱅크에서 전자등기" 표시',tag:'표시',status:'PASS'},
+    {id:'14-9',name:'단계 텍스트 "케이뱅크에서 대출 실행" 표시',tag:'표시',status:'PASS'},
+    {id:'14-10',name:'관련 상품 추천 "아파트담보대출 보러가기" 표시',tag:'표시',status:'PASS'},
+    {id:'14-11',name:'"목록 돌아가기" 버튼 표시',tag:'표시',status:'PASS'},
+    {id:'14-12',name:'"목록 돌아가기" 클릭 시 /web/product/loan/list 로 복원',tag:'이동',status:'PASS'},
+  ]},
+  {id:'15',name:'상세 페이지 — ONE 체크카드(K-패스) (카드)',tests:[
+    {id:'15-1',name:'URL이 /web/product/card/one-card 인지 확인',tag:'표시',status:'PASS'},
+    {id:'15-2',name:'상품명 "ONE 체크카드(K-패스)" 표시',tag:'표시',status:'PASS'},
+    {id:'15-3',name:'캐치프레이즈 "K-패스 혜택과 함께" 표시',tag:'표시',status:'PASS'},
+    {id:'15-4',name:'캐시백 안내 "내가 선택하는" 표시',tag:'표시',status:'PASS'},
+    {id:'15-5',name:'캐시백 카드 "369 캐시백" 표시',tag:'표시',status:'PASS'},
+    {id:'15-6',name:'캐시백 카드 "모두 다 캐시백" 표시',tag:'표시',status:'PASS'},
+    {id:'15-7',name:'캐시백 카드 "여기서 더 캐시백" 표시',tag:'표시',status:'PASS'},
+    {id:'15-8',name:'K-패스 안내 "교통비 월 3,000원" 표시',tag:'표시',status:'PASS'},
+    {id:'15-9',name:'"자세히 보기" 버튼이 1개 이상 존재',tag:'버튼',status:'PASS'},
+    {id:'15-10',name:'FAQ 영역 "자주 묻는 질문" 표시',tag:'표시',status:'PASS'},
+    {id:'15-11',name:'FAQ 항목 "ONE 체크카드로 K-패스 모두의 카드 혜택을 받고 싶어요" 표시',tag:'표시',status:'PASS'},
+    {id:'15-12',name:'섹션 라벨 "약관 및 상품설명서" 표시',tag:'표시',status:'PASS'},
+    {id:'15-13',name:'"목록 돌아가기" 클릭 시 /web/product/card/list 로 복원',tag:'이동',status:'PASS'},
+  ]},
+  {id:'16',name:'상세 페이지 — 공통 검증',tests:[
+    {id:'16-1',name:'예적금 상세 — 헤더 GNB(앱 다운로드 버튼)가 유지',tag:'표시',status:'PASS'},
+    {id:'16-2',name:'대출 상세 — 헤더 GNB(앱 다운로드 버튼)가 유지',tag:'표시',status:'PASS'},
+    {id:'16-3',name:'카드 상세 — 헤더 GNB(앱 다운로드 버튼)가 유지',tag:'표시',status:'PASS'},
+    {id:'16-4',name:'예적금 상세 — "준법감시인 심의필" 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'16-5',name:'대출 상세 — "준법감시인 심의필" 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'16-6',name:'카드 상세 — "준법감시인 심의필" 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'16-7',name:'예적금 상세 — <footer> 가 표시',tag:'푸터',status:'PASS'},
+    {id:'16-8',name:'대출 상세 — <footer> 가 표시',tag:'푸터',status:'PASS'},
+    {id:'16-9',name:'카드 상세 — <footer> 가 표시',tag:'푸터',status:'PASS'},
+  ]},
+  {id:'17',name:'전 상품 상세 — 얕은 전수 검증 (53)',tests:[
+    {id:'17-1',name:'[예적금] 데굴데굴 농장 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-2',name:'[예적금] 코드K 정기예금 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-3',name:'[예적금] 궁금한 적금 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-4',name:'[예적금] 주거래우대 자유적금 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-5',name:'[예적금] 챌린지박스 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-6',name:'[예적금] 코드K 자유적금 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-7',name:'[예적금] 플러스박스 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-8',name:'[예적금] 기분통장 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-9',name:'[예적금] 생활통장 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-10',name:'[예적금] 모임통장 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-11',name:'[예적금] 사장님통장 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-12',name:'[예적금] 중진공 정책자금 전용통장 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-13',name:'[예적금] 케이뱅크 ALPHA — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-14',name:'[대출] 아낌e보금자리론 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-15',name:'[대출] 아파트담보대출 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-16',name:'[대출] 전월세보증금대출 — 라이브 사이트 빈 페이지',tag:'표시',status:'SKIP'},
+    {id:'17-17',name:'[대출] 예금 적금 담보대출 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-18',name:'[대출] 신용대출 알아보기 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-19',name:'[대출] 신용대출 갈아타기 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-20',name:'[대출] 사장님대출 맞춤조회 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-21',name:'[대출] 사장님대출 갈아타기 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-22',name:'[대출] 사장님 부동산 담보대출 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-23',name:'[대출] 서울시 안심통장 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-24',name:'[카드] ONE 체크카드(K-패스) — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-25',name:'[카드] 플러스 체크카드 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-26',name:'[카드] KT멤버십 더블혜택 체크카드 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-27',name:'[카드] 모임 체크카드 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-28',name:'[카드] 신용카드 만들기 — 카탈로그 페이지 (목록 돌아가기 없음)',tag:'표시',status:'SKIP'},
+    {id:'17-29',name:'[카드] 케이뱅크 알파카드 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-30',name:'[사장님] 거래처 정보조회 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-31',name:'[사장님] 사장님 경영컨설팅 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-32',name:'[사장님] 맞춤 정책자금 받기 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-33',name:'[사장님] AI 세무상담 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-34',name:'[사장님] 사장님 신용리포트 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-35',name:'[사장님] 종합소득세 돌려받기 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-36',name:'[서비스] 해외송금 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-37',name:'[서비스] 환전 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-38',name:'[서비스] 전셋집 안심스캔 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-39',name:'[서비스] HF전세지킴보증 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-40',name:'[서비스] 우리집 변동알림 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-41',name:'[서비스] 내 신용관리 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-42',name:'[서비스] 내 DSR 계산기 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-43',name:'[투자] 미국 국채 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-44',name:'[투자] 미래에셋증권 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-45',name:'[투자] 하나증권 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-46',name:'[투자] 한국투자증권 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-47',name:'[투자] NH투자증권 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-48',name:'[투자] KB증권 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-49',name:'[투자] 연금저축계좌 — 진입/상품명/푸터/헤더',tag:'표시',status:'PASS'},
+    {id:'17-50',name:'[투자] 주식 모으기 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-51',name:'[투자] 금(KRX) 투자 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-52',name:'[투자] 가상자산 모으기 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+    {id:'17-53',name:'[투자] 잠자는 잔고 모으기 — 라이브 사이트 미구현 (404)',tag:'표시',status:'SKIP'},
+  ]},
+];
+PAGE_SECTIONS['blog'] = [
+  {id:'1',name:'페이지 기본 로딩',tests:[
+    {id:'1-1',name:'URL이 /web/news-blog/article/list를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'페이지 타이틀이 "KBank"',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'role="tablist" 컨테이너 존재',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'페이지 하단에 <footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-5',name:'"새소식&블로그" 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'1-6',name:'"케이뱅크," 히어로 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'1-7',name:'"비하인드 스토리" 서브텍스트 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'탭 네비게이션 (6개)',tests:[
+    {id:'2-1',name:'초기 로딩 시 "전체" 탭이 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'6개 탭 모두 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"테크" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-4',name:'"비하인드" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-5',name:'"케뱅스토리" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-6',name:'"컬쳐" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-7',name:'"팀" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-8',name:'"전체" 탭 복귀 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'3',name:'전체 탭 콘텐츠',tests:[
+    {id:'3-1',name:'"자금세탁방지팀을 소개합니다" 카드 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'3-2',name:'"2기 인턴 워크샵 하이라이트" 카드 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'3-3',name:'"Shorts 만들기" 카드 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'3-4',name:'"차세대 은행은 어떤 모습 일까?" 카드 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'3-5',name:'"2025 참관기:" 텍스트 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'4',name:'카테고리 라벨',tests:[
+    {id:'4-1',name:'"케뱅 - [팀 소개]" 카테고리 라벨 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-2',name:'"케뱅 - [인턴십]" 카테고리 라벨 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'5',name:'테크 탭 (빈 상태)',tests:[
+    {id:'5-1',name:'"테크" 탭 클릭 시 "등록된 내용이 없습니다." 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'6',name:'푸터',tests:[
+    {id:'6-1',name:'<footer>가 표시',tag:'푸터',status:'PASS'},
+    {id:'6-2',name:'은행 전화번호 "1522-1000" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-3',name:'카드 전화번호 "1522-1155" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-4',name:'해외 전화번호 "82-2-3778-9111" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-5',name:'"개인정보처리방침" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-6',name:'"신용정보활용체제" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-7',name:'"경영공시" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-8',name:'"준법제보" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-9',name:'"전자민원" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-10',name:'"상품공시실" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-11',name:'"보호금융상품등록부" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-12',name:'"금융소비자보호" 표시',tag:'푸터',status:'PASS'},
+    {id:'6-13',name:'"케이뱅크 기업뱅킹" 표시',tag:'푸터',status:'PASS'},
+  ]},
+];
+PAGE_SECTIONS['customer'] = [
+  {id:'1',name:'페이지 기본 로딩',tests:[
+    {id:'1-1',name:'URL이 /web/customer/faq/list를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'role="tablist" 컨테이너 존재',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'페이지 하단에 <footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'"자주 묻는 질문" 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'1-5',name:'검색 input(placeholder "예 : 신분증 촬영") 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'FAQ 카테고리 탭 (12개)',tests:[
+    {id:'2-1',name:'초기 "요즘 많이하는 문의" 탭 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'"전체" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"고유가 피해지원금" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-4',name:'"카드" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-5',name:'"보험" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-6',name:'"해외송금" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-7',name:'"케이뱅크 페이" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-8',name:'"앱서비스" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-9',name:'"이체 · 한도" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-10',name:'"ATM · CD" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-11',name:'"공과금" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-12',name:'"사고신고" 탭 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'3',name:'탭 클릭 → aria-selected 전환',tests:[
+    {id:'3-1',name:'"전체" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-2',name:'"카드" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-3',name:'"보험" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-4',name:'"해외송금" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-5',name:'"이체 · 한도" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-6',name:'"요즘 많이하는 문의" 탭 복귀 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'4',name:'탭별 FAQ 콘텐츠',tests:[
+    {id:'4-1',name:'"요즘 많이하는 문의" 탭에 [후불교통카드] FAQ 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-2',name:'"전체" 탭에 [ONE체크카드] FAQ 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-3',name:'"전체" 탭에 "총"/"건" 카운트 텍스트 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-4',name:'"고유가 피해지원금" 탭에 관련 FAQ 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-5',name:'"카드" 탭에 [ONE체크카드] 관련 FAQ 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-6',name:'"보험" 탭에 [상품가입] 관련 FAQ 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'4-7',name:'"해외송금" 탭에 [환전] 관련 FAQ 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'5',name:'FAQ 아코디언',tests:[
+    {id:'5-1',name:'첫 FAQ 질문이 초기에 aria-expanded=false',tag:'상태',status:'PASS'},
+    {id:'5-2',name:'첫 FAQ 클릭 시 aria-expanded=true',tag:'아코디언',status:'PASS'},
+    {id:'5-3',name:'열린 FAQ 다시 클릭 시 aria-expanded=false 복원',tag:'아코디언',status:'PASS'},
+  ]},
+  {id:'6',name:'검색 기능',tests:[
+    {id:'6-1',name:'검색 input visible',tag:'표시',status:'PASS'},
+    {id:'6-2',name:'검색 input enabled',tag:'버튼',status:'PASS'},
+    {id:'6-3',name:'"이체" 검색 후 "총" 텍스트 표시',tag:'검색',status:'PASS'},
+    {id:'6-4',name:'"케이뱅크" 검색 후 결과 목록 노출',tag:'검색',status:'PASS'},
+  ]},
+  {id:'7',name:'푸터',tests:[
+    {id:'7-1',name:'<footer>가 표시',tag:'푸터',status:'PASS'},
+    {id:'7-2',name:'은행 전화번호 "1522-1000" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-3',name:'카드 전화번호 "1522-1155" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-4',name:'해외 전화번호 "82-2-3778-9111" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-5',name:'"개인정보처리방침" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-6',name:'"보호금융상품등록부" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-7',name:'"금융소비자보호" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-8',name:'인증범위 안내 텍스트 표시',tag:'푸터',status:'PASS'},
+  ]},
+];
+PAGE_SECTIONS['policy'] = [
+  {id:'1',name:'페이지 기본 로딩',tests:[
+    {id:'1-1',name:'URL이 /web/common/policy/info를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'role="tablist" 컨테이너 존재',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'페이지 하단에 <footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'"고객정보보호정책" 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'1-5',name:'캐치프레이즈 "케이뱅크는 고객님의 개인정보를" 표시',tag:'표시',status:'PASS'},
+    {id:'1-6',name:'부제목 "안전하게 관리합니다" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'탭 네비게이션 (6개)',tests:[
+    {id:'2-1',name:'초기 "개인정보처리방침" 탭 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'"개인정보처리방침" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"처리 현황" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-4',name:'"위탁/제휴 현황" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-5',name:'"신용정보활용체제" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-6',name:'"고정형 영상처리기기 관리방침" 탭 표시',tag:'표시',status:'PASS'},
+    {id:'2-7',name:'"이용자 유의사항" 탭 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'3',name:'탭 클릭 → aria-selected 전환',tests:[
+    {id:'3-1',name:'"처리 현황" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-2',name:'"위탁/제휴 현황" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-3',name:'"신용정보활용체제" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-4',name:'"고정형 영상처리기기 관리방침" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-5',name:'"이용자 유의사항" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'3-6',name:'"개인정보처리방침" 탭 복귀 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'4',name:'개인정보처리방침 콘텐츠',tests:[
+    {id:'4-1',name:'6단계 라벨 "수집" 표시',tag:'표시',status:'PASS'},
+    {id:'4-2',name:'6단계 라벨 "이용" 표시',tag:'표시',status:'PASS'},
+    {id:'4-3',name:'6단계 라벨 "제공" 표시',tag:'표시',status:'PASS'},
+    {id:'4-4',name:'6단계 라벨 "삭제" 표시',tag:'표시',status:'PASS'},
+    {id:'4-5',name:'6단계 라벨 "보호" 표시',tag:'표시',status:'PASS'},
+    {id:'4-6',name:'6단계 라벨 "권리" 표시',tag:'표시',status:'PASS'},
+    {id:'4-7',name:'"1. 개인정보의 수집항목" 섹션 표시',tag:'표시',status:'PASS'},
+    {id:'4-8',name:'"어떤 개인정보를" 안내 표시',tag:'표시',status:'PASS'},
+    {id:'4-9',name:'"필수적 정보" 항목 표시',tag:'표시',status:'PASS'},
+    {id:'4-10',name:'"선택적 정보" 항목 표시',tag:'표시',status:'PASS'},
+    {id:'4-11',name:'"전자금융거래법에 따른 수집정보" 항목 표시',tag:'표시',status:'PASS'},
+    {id:'4-12',name:'"3. 개인정보의 제3자 제공에 관한 사항" 섹션 표시',tag:'표시',status:'PASS'},
+    {id:'4-13',name:'"4. 개인정보 처리의 위탁에 관한 사항" 섹션 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'5',name:'처리 현황 탭 콘텐츠',tests:[
+    {id:'5-1',name:'"개인신용정보 처리 현황" 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-2',name:'"가명정보 처리 현황" 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'5-3',name:'"개인정보처리 상세현황" 텍스트 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'6',name:'위탁/제휴 현황 탭 콘텐츠',tests:[
+    {id:'6-1',name:'"위탁 현황" 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'6-2',name:'"제휴 현황" 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'7',name:'신용정보활용체제 탭 콘텐츠',tests:[
+    {id:'7-1',name:'"분리 보관된 개인신용정보 활용" 표시',tag:'콘텐츠',status:'PASS'},
+    {id:'7-2',name:'"고객관리안내문" 표시',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'8',name:'푸터',tests:[
+    {id:'8-1',name:'<footer>가 표시',tag:'푸터',status:'PASS'},
+    {id:'8-2',name:'은행 전화번호 "1522-1000" 표시',tag:'푸터',status:'PASS'},
+    {id:'8-3',name:'카드 전화번호 "1522-1155" 표시',tag:'푸터',status:'PASS'},
+    {id:'8-4',name:'"개인정보처리방침" 표시',tag:'푸터',status:'PASS'},
+    {id:'8-5',name:'"신용정보활용체제" 표시',tag:'푸터',status:'PASS'},
+    {id:'8-6',name:'"보호금융상품등록부" 표시',tag:'푸터',status:'PASS'},
+  ]},
+];
+PAGE_SECTIONS['protected-product'] = [
+  {id:'1',name:'페이지 기본 로딩',tests:[
+    {id:'1-1',name:'URL이 /web/common/protected-product/info를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'페이지 하단에 <footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'"보호금융상품등록부" 페이지 타이틀 표시',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'안내 본문(예금자보호법) 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'등록부 안내',tests:[
+    {id:'2-1',name:'예금보험공사 URL "www.kdic.or.kr" 표시',tag:'표시',status:'PASS'},
+    {id:'2-2',name:'정부/한국은행/금융감독원/예금보험공사 안내 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"보험계약자 및 보험료납부자가 법인인 보험계약은 보호되지 않습니다" 표시',tag:'표시',status:'PASS'},
+    {id:'2-4',name:'퇴직연금 안내 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'2-5',name:'적용일 "2025년 10월 1일" 표시',tag:'표시',status:'PASS'},
+    {id:'2-6',name:'발행기관 "케이뱅크" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'3',name:'등록부 섹션',tests:[
+    {id:'3-1',name:'"보호금융상품 취급 목록" 섹션 표시',tag:'표시',status:'PASS'},
+    {id:'3-2',name:'"타 금융회사 보호금융상품 취급 목록" 섹션 표시',tag:'표시',status:'PASS'},
+    {id:'3-3',name:'"보호금융상품 등록부 변동내역" 섹션 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'4',name:'푸터',tests:[
+    {id:'4-1',name:'<footer>가 표시',tag:'푸터',status:'PASS'},
+    {id:'4-2',name:'은행 전화번호 "1522-1000" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-3',name:'카드 전화번호 "1522-1155" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-4',name:'"개인정보처리방침" 표시',tag:'푸터',status:'PASS'},
+    {id:'4-5',name:'"보호금융상품등록부" 표시',tag:'푸터',status:'PASS'},
+  ]},
+];
+
+function getPageTests(pageId, includeCommon) {
+  var all = [];
+  if (includeCommon) {
+    for (var c = 0; c < COMMON_TESTS.length; c++) {
+      var ct = COMMON_TESTS[c];
+      all.push({id:ct.id,name:ct.name,tag:ct.tag,status:ct.status,type:'COMMON',section:'공통 — 헤더 & GNB'});
+    }
+  }
+  var secs = PAGE_SECTIONS[pageId] || [];
+  for (var s = 0; s < secs.length; s++) {
+    var sec = secs[s];
+    for (var t = 0; t < sec.tests.length; t++) {
+      var tt = sec.tests[t];
+      all.push({id:tt.id,name:tt.name,tag:tt.tag,status:tt.status,type:'고유',section:sec.id+'. '+sec.name});
+    }
+  }
+  return all;
+}
+function countTests(pageId, includeCommon) {
+  var all = getPageTests(pageId, includeCommon);
+  var pass=0,fail=0,skip=0;
+  for(var i=0;i<all.length;i++){
+    if(all[i].status==='PASS')pass++;
+    else if(all[i].status==='SKIP')skip++;
+    else fail++;
+  }
+  return{total:all.length,pass:pass,fail:fail,skip:skip};
+}
+function tagBadge(tag){return '<span class="tag-badge tag-'+tag+'">'+tag+'</span>';}
+function statusBadge(s){return '<span class="status-badge status-'+s+'">'+s+'</span>';}
+function typeBadge(t){return '<span class="type-badge type-'+t+'">'+t+'</span>';}
+
+function renderSummary(){
+  var tt=0,tp=0,tf=0,ts=0;
+  for(var p=0;p<PAGES_META.length;p++){var c=countTests(PAGES_META[p].id,PAGES_META[p].hasCommon);tt+=c.total;tp+=c.pass;tf+=c.fail;ts+=c.skip;}
+  var rate=tt>0?Math.round(tp/(tt-ts)*100):0;
+  document.getElementById('hero-meta').textContent='실행일: '+TODAY+' | 대상 페이지: '+PAGES_META.length+'개 | 총 '+tt+'건';
+  document.getElementById('summary-area').innerHTML=
+    '<div class="stat-card"><div class="val">'+PAGES_META.length+'</div><div class="lbl">대상 페이지</div></div>'+
+    '<div class="stat-card"><div class="val">'+tt+'</div><div class="lbl">전체 테스트</div></div>'+
+    '<div class="stat-card pass"><div class="val">'+tp+'</div><div class="lbl">PASS</div></div>'+
+    '<div class="stat-card fail"><div class="val">'+tf+'</div><div class="lbl">FAIL</div></div>'+
+    (ts>0?'<div class="stat-card" style="--c:#854D0E"><div class="val" style="color:#854D0E">'+ts+'</div><div class="lbl">SKIP</div></div>':'')+
+    '<div class="stat-card rate"><div class="val">'+rate+'%</div><div class="lbl">PASS 비율<br><small style="font-size:10px;opacity:.6">(SKIP 제외)</small></div></div>';
+}
+function renderPageTabs(){
+  var html='';
+  for(var i=0;i<PAGES_META.length;i++){
+    var pm=PAGES_META[i];
+    var c=countTests(pm.id,pm.hasCommon);
+    var cls=i===0?' active':'';
+    html+='<div class="page-tab'+cls+'" onclick="showPage(\''+pm.id+'\')" id="tab-'+pm.id+'">'+pm.name+' <small style="opacity:.6">('+c.total+')</small></div>';
+  }
+  document.getElementById('page-tabs').innerHTML=html;
+}
+function renderAccordion(pageId){
+  var secs=PAGE_SECTIONS[pageId]||[];
+  var pm=null;for(var i=0;i<PAGES_META.length;i++){if(PAGES_META[i].id===pageId){pm=PAGES_META[i];break;}}
+  var html='';
+  if(pm&&pm.hasCommon){
+    html+='<div class="section-card" id="acc-'+pageId+'-common">'+
+      '<div class="section-head" onclick="toggleSection(\''+pageId+'-common\')">'+
+      '<span class="section-title">공통 — 헤더 &amp; GNB</span>'+
+      '<div class="section-meta"><span class="badge pass">'+COMMON_TESTS.length+' PASS</span><span class="badge total">'+COMMON_TESTS.length+' 건</span><span class="chevron">▼</span></div>'+
+      '</div><div class="section-body">';
+    for(var c=0;c<COMMON_TESTS.length;c++){
+      var t=COMMON_TESTS[c];
+      html+='<div class="test-row"><span class="test-id">'+t.id+'</span><span class="test-name">'+t.name+'</span>'+tagBadge(t.tag)+statusBadge(t.status)+'</div>';
+    }
+    html+='</div></div>';
+  }
+  for(var s=0;s<secs.length;s++){
+    var sec=secs[s];var sp=0,sf=0,ssk=0;
+    for(var t2=0;t2<sec.tests.length;t2++){
+      var st=sec.tests[t2].status;
+      if(st==='PASS')sp++;
+      else if(st==='SKIP')ssk++;
+      else sf++;
+    }
+    var secId=pageId+'-'+sec.id;
+    html+='<div class="section-card" id="acc-'+secId+'">'+
+      '<div class="section-head" onclick="toggleSection(\''+secId+'\')">'+
+      '<span class="section-title">'+sec.id+'. '+sec.name+'</span>'+
+      '<div class="section-meta">';
+    if(sp>0)html+='<span class="badge pass">'+sp+' PASS</span>';
+    if(sf>0)html+='<span class="badge fail">'+sf+' FAIL</span>';
+    if(ssk>0)html+='<span class="badge" style="background:#FEF9C3;color:#854D0E">'+ssk+' SKIP</span>';
+    html+='<span class="badge total">'+sec.tests.length+' 건</span><span class="chevron">▼</span></div></div><div class="section-body">';
+    for(var t3=0;t3<sec.tests.length;t3++){
+      var tt=sec.tests[t3];
+      html+='<div class="test-row"><span class="test-id">'+tt.id+'</span><span class="test-name">'+tt.name+'</span>'+tagBadge(tt.tag)+statusBadge(tt.status)+'</div>';
+    }
+    html+='</div></div>';
+  }
+  return html;
+}
+function renderTable(pageId){
+  var pm=null;for(var i=0;i<PAGES_META.length;i++){if(PAGES_META[i].id===pageId){pm=PAGES_META[i];break;}}
+  var all=getPageTests(pageId,pm?pm.hasCommon:false);
+  var html='<table class="tc-table"><thead><tr><th>#</th><th>섹션</th><th>테스트 항목</th><th>태그</th><th>구분</th><th>상태</th></tr></thead><tbody>';
+  for(var i=0;i<all.length;i++){
+    var t=all[i];
+    var bg=i%2===1?' style="background:#F8FAFC"':'';
+    html+='<tr'+bg+'><td>'+(i+1)+'</td><td style="color:#64748B;font-size:11px">'+t.section+'</td><td>'+t.name+'</td><td>'+tagBadge(t.tag)+'</td><td>'+typeBadge(t.type)+'</td><td>'+statusBadge(t.status)+'</td></tr>';
+  }
+  return html+'</tbody></table>';
+}
+function renderChart(){
+  var html='<div class="chart-section"><div class="chart-title">페이지별 통과율 비교</div>';
+  for(var p=0;p<PAGES_META.length;p++){
+    var pm=PAGES_META[p];var c=countTests(pm.id,pm.hasCommon);
+    var pct=c.total>0?Math.round(c.pass/c.total*100):0;
+    html+='<div class="chart-row">'+
+      '<span class="chart-label">'+pm.name+'</span>'+
+      '<div class="chart-bar-wrap"><div class="chart-bar" style="width:'+pct+'%"><span class="chart-pct">'+pct+'%</span></div></div>'+
+      '<span class="chart-count">'+c.pass+' / '+c.total+'</span></div>';
+  }
+  return html+'</div>';
+}
+function renderAllPages(){
+  var html='';
+  for(var p=0;p<PAGES_META.length;p++){
+    var pm=PAGES_META[p];var cls=p===0?' active':'';var c=countTests(pm.id,pm.hasCommon);
+    html+='<div class="page-panel'+cls+'" id="panel-'+pm.id+'">'+
+      '<div style="margin-bottom:14px;padding:10px 14px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">'+
+      '<span style="color:#64748B;font-size:12px">스펙: <b style="color:#1E3A5F">'+pm.spec+'</b></span>'+
+      '<span style="color:#64748B;font-size:12px">최종 실행: <b style="color:#1E3A5F">'+pm.lastRun+'</b></span>'+
+      '<span class="badge pass" style="font-size:12px">'+c.pass+' PASS</span>'+
+      (c.fail>0?'<span class="badge fail" style="font-size:12px">'+c.fail+' FAIL</span>':'')+
+      (c.skip>0?'<span class="badge" style="font-size:12px;background:#FEF9C3;color:#854D0E">'+c.skip+' SKIP</span>':'')+
+      '</div>'+
+      '<div class="sub-tabs">'+
+      '<div class="sub-tab active" onclick="showSubTab(\''+pm.id+'\',\'result\')" id="sub-'+pm.id+'-result">테스트 결과</div>'+
+      '<div class="sub-tab" onclick="showSubTab(\''+pm.id+'\',\'cases\')" id="sub-'+pm.id+'-cases">테스트 케이스 ('+c.total+')</div>'+
+      '</div>'+
+      '<div class="sub-panel active" id="subp-'+pm.id+'-result">'+renderAccordion(pm.id)+'</div>'+
+      '<div class="sub-panel" id="subp-'+pm.id+'-cases">'+renderTable(pm.id)+'</div>'+
+      '</div>';
+  }
+  html+=renderChart();
+  document.getElementById('content-area').innerHTML=html;
+}
+function showPage(id){
+  var panels=document.querySelectorAll('.page-panel');
+  var tabs=document.querySelectorAll('.page-tab');
+  for(var i=0;i<panels.length;i++)panels[i].classList.remove('active');
+  for(var i=0;i<tabs.length;i++)tabs[i].classList.remove('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+function showSubTab(pageId,which){
+  ['result','cases'].forEach(function(w){
+    document.getElementById('subp-'+pageId+'-'+w).classList.remove('active');
+    document.getElementById('sub-'+pageId+'-'+w).classList.remove('active');
+  });
+  document.getElementById('subp-'+pageId+'-'+which).classList.add('active');
+  document.getElementById('sub-'+pageId+'-'+which).classList.add('active');
+}
+function toggleSection(id){var el=document.getElementById('acc-'+id);if(el)el.classList.toggle('open');}
+
+function pad2(n){return n<10?'0'+n:''+n;}
+function xe(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function exportExcel(){
+  var d=new Date();
+  var ds=d.getFullYear()+''+pad2(d.getMonth()+1)+''+pad2(d.getDate());
+  var xml='<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n'+
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n'+
+    '<Styles>\n'+
+    '<Style ss:ID="sT"><Font ss:Bold="1" ss:Color="#FFFFFF" ss:Size="12"/><Interior ss:Color="#1E3A5F" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>\n'+
+    '<Style ss:ID="sH"><Font ss:Bold="1" ss:Color="#FFFFFF" ss:Size="10"/><Interior ss:Color="#334155" ss:Pattern="Solid"/></Style>\n'+
+    '<Style ss:ID="sS"><Font ss:Bold="1" ss:Size="10"/><Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/></Style>\n'+
+    '<Style ss:ID="sD"><Font ss:Size="10"/><Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/></Style>\n'+
+    '<Style ss:ID="sA"><Font ss:Size="10"/><Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/></Style>\n'+
+    '<Style ss:ID="sP"><Font ss:Bold="1" ss:Color="#166534" ss:Size="10"/><Interior ss:Color="#DCFCE7" ss:Pattern="Solid"/></Style>\n'+
+    '<Style ss:ID="sF"><Font ss:Bold="1" ss:Color="#991B1B" ss:Size="10"/><Interior ss:Color="#FEE2E2" ss:Pattern="Solid"/></Style>\n'+
+    '</Styles>\n';
+
+  xml+='<Worksheet ss:Name="전체 요약"><Table>\n'+
+    '<Row ss:Height="28"><Cell ss:StyleID="sT" ss:MergeAcross="4"><Data ss:Type="String">KBank PC 홈페이지 테스트 결과서 — '+TODAY+'</Data></Cell></Row>\n'+
+    '<Row><Cell ss:StyleID="sH"><Data ss:Type="String">페이지</Data></Cell>'+
+    '<Cell ss:StyleID="sH"><Data ss:Type="String">전체</Data></Cell>'+
+    '<Cell ss:StyleID="sH"><Data ss:Type="String">PASS</Data></Cell>'+
+    '<Cell ss:StyleID="sH"><Data ss:Type="String">FAIL</Data></Cell>'+
+    '<Cell ss:StyleID="sH"><Data ss:Type="String">통과율</Data></Cell></Row>\n';
+  var gt=0,gp=0,gf=0;
+  for(var p=0;p<PAGES_META.length;p++){
+    var pm=PAGES_META[p];var c=countTests(pm.id,pm.hasCommon);var pct=c.total>0?Math.round(c.pass/c.total*100):0;
+    gt+=c.total;gp+=c.pass;gf+=c.fail;
+    xml+='<Row><Cell ss:StyleID="sD"><Data ss:Type="String">'+xe(pm.name)+'</Data></Cell>'+
+      '<Cell ss:StyleID="sD"><Data ss:Type="Number">'+c.total+'</Data></Cell>'+
+      '<Cell ss:StyleID="sP"><Data ss:Type="Number">'+c.pass+'</Data></Cell>'+
+      '<Cell ss:StyleID="'+(c.fail>0?'sF':'sD')+'"><Data ss:Type="Number">'+c.fail+'</Data></Cell>'+
+      '<Cell ss:StyleID="sD"><Data ss:Type="String">'+pct+'%</Data></Cell></Row>\n';
+  }
+  var gr=gt>0?Math.round(gp/gt*100):0;
+  xml+='<Row><Cell ss:StyleID="sS"><Data ss:Type="String">합계</Data></Cell>'+
+    '<Cell ss:StyleID="sS"><Data ss:Type="Number">'+gt+'</Data></Cell>'+
+    '<Cell ss:StyleID="sS"><Data ss:Type="Number">'+gp+'</Data></Cell>'+
+    '<Cell ss:StyleID="sS"><Data ss:Type="Number">'+gf+'</Data></Cell>'+
+    '<Cell ss:StyleID="sS"><Data ss:Type="String">'+gr+'%</Data></Cell></Row>\n'+
+    '</Table></Worksheet>\n';
+
+  for(var p=0;p<PAGES_META.length;p++){
+    var pm=PAGES_META[p];var all=getPageTests(pm.id,pm.hasCommon);
+    xml+='<Worksheet ss:Name="'+xe(pm.name)+'"><Table>\n'+
+      '<Row ss:Height="22"><Cell ss:StyleID="sT" ss:MergeAcross="5"><Data ss:Type="String">'+xe(pm.name)+' — '+pm.url+'</Data></Cell></Row>\n'+
+      '<Row><Cell ss:StyleID="sH"><Data ss:Type="String">#</Data></Cell>'+
+      '<Cell ss:StyleID="sH"><Data ss:Type="String">섹션</Data></Cell>'+
+      '<Cell ss:StyleID="sH"><Data ss:Type="String">테스트 항목</Data></Cell>'+
+      '<Cell ss:StyleID="sH"><Data ss:Type="String">태그</Data></Cell>'+
+      '<Cell ss:StyleID="sH"><Data ss:Type="String">구분</Data></Cell>'+
+      '<Cell ss:StyleID="sH"><Data ss:Type="String">상태</Data></Cell></Row>\n';
+    var prevSec='',rn=0;
+    for(var i=0;i<all.length;i++){
+      var t=all[i];
+      if(t.section!==prevSec){
+        xml+='<Row><Cell ss:StyleID="sS" ss:MergeAcross="5"><Data ss:Type="String">'+xe(t.section)+'</Data></Cell></Row>\n';
+        prevSec=t.section;rn=0;
+      }
+      rn++;
+      var ds2=rn%2===0?'sA':'sD';
+      var ss2=t.status==='PASS'?'sP':(t.status==='FAIL'?'sF':'sD');
+      xml+='<Row><Cell ss:StyleID="'+ds2+'"><Data ss:Type="Number">'+(i+1)+'</Data></Cell>'+
+        '<Cell ss:StyleID="'+ds2+'"><Data ss:Type="String">'+xe(t.section)+'</Data></Cell>'+
+        '<Cell ss:StyleID="'+ds2+'"><Data ss:Type="String">'+xe(t.name)+'</Data></Cell>'+
+        '<Cell ss:StyleID="'+ds2+'"><Data ss:Type="String">'+xe(t.tag)+'</Data></Cell>'+
+        '<Cell ss:StyleID="'+ds2+'"><Data ss:Type="String">'+t.type+'</Data></Cell>'+
+        '<Cell ss:StyleID="'+ss2+'"><Data ss:Type="String">'+t.status+'</Data></Cell></Row>\n';
+    }
+    xml+='</Table></Worksheet>\n';
+  }
+  xml+='</Workbook>';
+  var blob=new Blob([xml],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kbank-e2e-report-'+ds+'.xls';a.click();
+}
+
+window.onload=function(){renderSummary();renderPageTabs();renderAllPages();};
+</script>
+</body>
+</html>
