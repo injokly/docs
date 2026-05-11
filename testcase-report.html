@@ -82,6 +82,18 @@ body{font-family:'Apple SD Gothic Neo',sans-serif;background:#F8FAFC;color:#1E29
 .chart-bar{height:100%;background:linear-gradient(90deg,#2563EB,#60A5FA);border-radius:4px;display:flex;align-items:center;padding:0 8px;min-width:50px}
 .chart-pct{font-size:11px;color:#fff;font-weight:600}
 .chart-count{font-size:12px;color:#64748B;width:65px;flex-shrink:0}
+
+/* ⭐ 옵션 A: 검증 모드 토글 */
+.mode-toggle{margin-bottom:18px;background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mode-toggle-label{font-size:12px;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.mode-toggle-group{display:flex;background:#F1F5F9;border-radius:8px;padding:4px;gap:2px}
+.mode-toggle-btn{padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:#64748B;display:flex;align-items:center;gap:6px;transition:all .15s;border:none;background:none}
+.mode-toggle-btn.active{background:#fff;color:#2563EB;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.mode-toggle-btn .ico{font-size:14px}
+.mode-toggle-btn.design.active{color:#7C3AED}
+.mode-toggle-btn.combined.active{color:#1E3A5F}
+.mode-toggle-info{margin-left:auto;font-size:12px;color:#64748B}
+.mode-toggle-info b{color:#1E3A5F}
 </style>
 </head>
 <body>
@@ -100,7 +112,10 @@ body{font-family:'Apple SD Gothic Neo',sans-serif;background:#F8FAFC;color:#1E29
 var TODAY = '2026-05-07';
 var PAGES_META = [
   {id:'home',             name:'메인 홈',          url:'/web/web-home/home/main',           spec:'20260506-122725-home.spec.ts',              lastRun:'2026-05-06',hasCommon:false},
-  {id:'about',            name:'은행소개',         url:'/web/about/kbank/info',             spec:'20260507-111042-about.spec.ts',             lastRun:'2026-05-07',hasCommon:true},
+  {id:'about',            name:'은행소개',         url:'/web/about/kbank/info',             spec:'20260507-111042-about.spec.ts',             lastRun:'2026-05-07',hasCommon:true,figmaSpec:'20260507-153230-about-figma.spec.ts',figma:'https://www.figma.com/design/gooyUhZLUlsMOUbPEtT8ZT/?node-id=1650-2181',figmaSectionsId:'about-figma'},
+  {id:'brand',            name:'브랜드',           url:'/web/about/brand/info?tab=brand-story', spec:'(라이브 spec 미작성)',                  lastRun:'2026-05-08',hasCommon:true,figmaSpec:'20260508-111307-brand-figma.spec.ts',figma:'https://www.figma.com/design/gooyUhZLUlsMOUbPEtT8ZT/?node-id=1007-8516',figmaSectionsId:'brand-figma',figmaOnly:true},
+  {id:'ethics',           name:'윤리강령',         url:'/web/about/ethics/info?tab=general', spec:'(라이브 spec 미작성)',                     lastRun:'2026-05-08',hasCommon:true,figmaSpec:'20260508-115335-ethics-figma.spec.ts',figma:'https://www.figma.com/design/gooyUhZLUlsMOUbPEtT8ZT/?node-id=3-3',figmaSectionsId:'ethics-figma',figmaOnly:true},
+  {id:'notice',           name:'공지사항',         url:'/web/about/notice/list?tab=notice', spec:'(라이브 spec 미작성)',                     lastRun:'2026-05-11',hasCommon:true,figmaSpec:'20260511-103734-notice-figma.spec.ts',figma:'https://www.figma.com/design/gooyUhZLUlsMOUbPEtT8ZT/?node-id=604-1353',figmaSectionsId:'notice-figma',figmaOnly:true},
   {id:'product',          name:'상품안내',         url:'/web/product/deposit/list',         spec:'20260506-165358-product.spec.ts',           lastRun:'2026-05-06',hasCommon:true},
   {id:'blog',             name:'새소식블로그',     url:'/web/news-blog/article/list',       spec:'20260507-111042-blog.spec.ts',              lastRun:'2026-05-07',hasCommon:true},
   {id:'customer',         name:'고객센터',         url:'/web/customer/faq/list',            spec:'20260507-111042-customer.spec.ts',          lastRun:'2026-05-07',hasCommon:true},
@@ -758,6 +773,422 @@ PAGE_SECTIONS['policy'] = [
     {id:'8-6',name:'"보호금융상품등록부" 표시',tag:'푸터',status:'PASS'},
   ]},
 ];
+PAGE_SECTIONS['about-figma'] = [
+  {id:'1',name:'페이지 진입 & 페이지 타이틀',tests:[
+    {id:'1-1',name:'URL이 /web/about/kbank/info를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'페이지 최상단 타이틀 "케이뱅크" 표시',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'[Figma 갭 G5] "은행소개" GNB 메뉴 활성 시각 표시 (#4262ff)',tag:'상태',status:'FAIL'},
+    {id:'1-4',name:'헤더 우측 "앱 다운로드" 버튼이 표시되고 enabled',tag:'버튼',status:'PASS'},
+  ]},
+  {id:'2',name:'히어로 이미지 블록',tests:[
+    {id:'2-1',name:'히어로 이미지 영역(1080×440) 렌더링',tag:'표시',status:'PASS'},
+    {id:'2-2',name:'히어로 dim 오버레이 적용 확인',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'히어로 오버레이 텍스트 "혁신과 기술로 더 나은 금융생활을" 표시',tag:'표시',status:'PASS'},
+    {id:'2-4',name:'히어로 오버레이 텍스트 "열어가는 디지털 금융 리더" 표시',tag:'표시',status:'PASS'},
+    {id:'2-5',name:'[Figma 토큰] 히어로 이미지 둥근 모서리 20px',tag:'상태',status:'PASS'},
+    {id:'2-6',name:'[접근성] 히어로 이미지 alt 속성 존재',tag:'접근성',status:'PASS'},
+  ]},
+  {id:'3',name:'탭 네비게이션',tests:[
+    {id:'3-1',name:'초기 "비전" 탭 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'3-2',name:'"비전" 탭 활성 표시(2px focus bar) Figma 명세 일치',tag:'상태',status:'PASS'},
+    {id:'3-2b',name:'비활성 탭에는 focus bar가 없어야 함',tag:'상태',status:'PASS'},
+    {id:'3-3',name:'"비전" 탭 라벨이 18px Bold 표시',tag:'상태',status:'PASS'},
+    {id:'3-4',name:'"연혁" 탭이 비활성 (aria-selected=false)',tag:'상태',status:'PASS'},
+    {id:'3-5',name:'"주주사 소개" 탭이 비활성',tag:'상태',status:'PASS'},
+    {id:'3-6',name:'"오시는길" 탭이 비활성',tag:'상태',status:'PASS'},
+    {id:'3-7',name:'[Figma 갭 G8] 탭 그룹 하단 1px divider 존재',tag:'상태',status:'FAIL'},
+    {id:'3-8',name:'"연혁" 탭 클릭 시 aria-selected=true 전환',tag:'콘텐츠',status:'PASS'},
+    {id:'3-9',name:'"주주사 소개" 탭 클릭 시 aria-selected=true 전환',tag:'콘텐츠',status:'PASS'},
+    {id:'3-10',name:'"오시는길" 탭 클릭 시 aria-selected=true 전환',tag:'콘텐츠',status:'PASS'},
+    {id:'3-11',name:'"비전" 탭 복귀 시 aria-selected=true 복원',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'4',name:'비전 텍스트 섹션',tests:[
+    {id:'4-1',name:'섹션 제목 "대한민국 제1호 인터넷전문은행" 표시 (32px Bold)',tag:'표시',status:'PASS'},
+    {id:'4-2',name:'본문 "케이뱅크는 국내 1호 인터넷전문은행으로…" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'5',name:'벤다이어그램 (Figma 갭 G2)',tests:[
+    {id:'5-1',name:'[Figma 갭 G2] 벤다이어그램 컨테이너 렌더링',tag:'표시',status:'SKIP'},
+    {id:'5-2',name:'[Figma 갭 G2] 좌측 원 "혁신 투자 허브" 표시',tag:'표시',status:'SKIP'},
+    {id:'5-3',name:'[Figma 갭 G2] 우측 원 "최신 기술 선도" 표시',tag:'표시',status:'SKIP'},
+    {id:'5-4',name:'[Figma 갭 G2] 중앙 겹침 "생활 속의" 표시',tag:'표시',status:'SKIP'},
+    {id:'5-5',name:'[Figma 갭 G2] 중앙 겹침 "은행" 표시',tag:'표시',status:'SKIP'},
+    {id:'5-6',name:'[Figma 갭 G2] 좌측 화살표 아이콘 표시',tag:'표시',status:'SKIP'},
+    {id:'5-7',name:'[Figma 갭 G2] 우측 화살표 아이콘 표시',tag:'표시',status:'SKIP'},
+    {id:'5-8',name:'[Figma 갭 G2] 다이어그램 콘텐츠 폭 1080px 중앙 정렬',tag:'상태',status:'SKIP'},
+  ]},
+  {id:'6',name:'Detail 본문 텍스트',tests:[
+    {id:'6-1',name:'[Figma 갭 G1] Detail 본문 Figma 명세 일치 ("앞으로도 케이뱅크는 고객의 니즈와…")',tag:'표시',status:'FAIL'},
+    {id:'6-2',name:'첫 비전 키워드 "‘생활 속의 은행’" Bold 강조',tag:'표시',status:'PASS'},
+    {id:'6-3',name:'두 번째 비전 키워드 "‘혁신투자 허브 은행’" Bold 강조',tag:'표시',status:'PASS'},
+    {id:'6-4',name:'세 번째 비전 키워드 "‘최신 기술 선도 은행’" Bold 강조',tag:'표시',status:'PASS'},
+    {id:'6-5',name:'영문 부제 "(Tech Leading Bank)" 표시',tag:'표시',status:'PASS'},
+    {id:'6-6',name:'마무리 문구 "고객분들께 한 걸음 더 다가가겠습니다." 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'7',name:'푸터 — 고객센터',tests:[
+    {id:'7-1',name:'푸터 상단 "고객센터" 헤딩 표시 (18px Bold)',tag:'푸터',status:'PASS'},
+    {id:'7-2',name:'은행 전화번호 "1522-1000" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-3',name:'카드 전화번호 "1522-1155" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-4',name:'해외 전화번호 "82-2-3778-9111" 표시',tag:'푸터',status:'PASS'},
+  ]},
+  {id:'7.2',name:'푸터 — 고객권리 및 공시정보',tests:[
+    {id:'7-5',name:'"고객권리 및 공시정보" 헤딩 표시',tag:'푸터',status:'PASS'},
+    {id:'7-6',name:'"개인정보처리방침" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-7',name:'"신용정보활용체제" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-8',name:'"경영공시" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-9',name:'"준법제보" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-10',name:'"전자민원" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-11',name:'"상품공시실" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-12',name:'"보호금융상품등록부" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-13',name:'"금융소비자보호" 표시',tag:'푸터',status:'PASS'},
+    {id:'7-14',name:'"케이뱅크 기업뱅킹" 표시',tag:'푸터',status:'PASS'},
+  ]},
+  {id:'7.3',name:'푸터 — 인증마크 & 안내문',tests:[
+    {id:'7-15',name:'WA(웹접근성) 인증마크 이미지 표시',tag:'표시',status:'PASS'},
+    {id:'7-16',name:'ISMS-P 인증마크 이미지 표시',tag:'표시',status:'PASS'},
+    {id:'7-17',name:'인증범위 안내 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'7-18',name:'유효기간 "2025.05.27 ~ 2028.05.26" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'7.4',name:'푸터 — 소셜 링크 (4종)',tests:[
+    {id:'7-19',name:'푸터에 소셜 아이콘 SVG가 정확히 4개 존재 (Figma 명세 일치)',tag:'표시',status:'PASS'},
+    {id:'7-20',name:'4개 소셜 아이콘이 모두 visible 상태',tag:'표시',status:'PASS'},
+    {id:'7-21',name:'소셜 아이콘 영역이 푸터 우측에 배치됨 (Figma 레이아웃 일치)',tag:'표시',status:'PASS'},
+    {id:'7-22',name:'[♿ A11Y 권고] 소셜 아이콘에 aria-label 추가 권장',tag:'접근성',status:'PASS'},
+  ]},
+  {id:'7.5',name:'푸터 메뉴 클릭 → 페이지 이동',tests:[
+    {id:'7-23',name:'"개인정보처리방침" 클릭 시 /web/common/policy/info 로 이동',tag:'이동',status:'PASS'},
+    {id:'7-24',name:'"신용정보활용체제" 클릭 시 /web/common/policy/info 로 이동',tag:'이동',status:'PASS'},
+    {id:'7-25',name:'"경영공시" 클릭 시 /web/about/ir/list 로 이동',tag:'이동',status:'PASS'},
+    {id:'7-26',name:'"전자민원" 클릭 시 /web/customer/online-complaint/customer-type-select 로 이동',tag:'이동',status:'PASS'},
+    {id:'7-27',name:'"상품공시실" 클릭 시 /web/customer/product-noti/noti 로 이동',tag:'이동',status:'PASS'},
+    {id:'7-28',name:'"보호금융상품등록부" 클릭 시 /web/common/protected-product/info 로 이동',tag:'이동',status:'PASS'},
+    {id:'7-29',name:'"금융소비자보호" 클릭 시 /web/customer/protection/system 로 이동',tag:'이동',status:'PASS'},
+  ]},
+  {id:'8',name:'레이아웃 & 디자인 토큰',tests:[
+    {id:'8-1',name:'MainLayout 좌우 패딩 확인',tag:'상태',status:'PASS'},
+    {id:'8-2',name:'콘텐츠 폭이 ~1080px',tag:'상태',status:'PASS'},
+    {id:'8-3',name:'페이지 배경색이 흰색',tag:'상태',status:'PASS'},
+    {id:'8-4',name:'푸터 배경색이 secondary(#f7f8fb 계열)',tag:'상태',status:'PASS'},
+    {id:'8-5',name:'모든 인터랙티브 요소가 a/button 태그',tag:'접근성',status:'PASS'},
+    {id:'8-6',name:'[Figma 갭 G5] 활성 GNB 메뉴 색상 시각 구분',tag:'접근성',status:'FAIL'},
+  ]},
+  {id:'9',name:'반응형 / 뷰포트 검증',tests:[
+    {id:'9-1',name:'데스크톱 1920px 뷰포트에서 디자인 그대로 렌더링',tag:'상태',status:'PASS'},
+    {id:'9-2',name:'1280px 뷰포트에서 GNB 9개 메뉴가 한 줄에 표시',tag:'표시',status:'PASS'},
+    {id:'9-3',name:'히어로 이미지가 콘텐츠 폭에 맞춰 렌더링',tag:'표시',status:'PASS'},
+  ]},
+  {id:'10',name:'연혁 탭',tests:[
+    {id:'10-1',name:'"연혁" 탭 클릭 시 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'10-2',name:'[Figma 갭 G10] 부제 "대한민국 금융사업 혁신의 시작" 표시',tag:'표시',status:'FAIL'},
+    {id:'10-3',name:'본문 "케이뱅크는 혁신적인 금융서비스를 통해…" 표시',tag:'표시',status:'PASS'},
+    {id:'10-4',name:'본문 "차별화된 고객 경험을 제공하는 금융 플랫폼으로 진화" 표시',tag:'표시',status:'PASS'},
+    {id:'10-5',name:'연혁 타임라인 "2015" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-6',name:'연혁 타임라인 "2016" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-7',name:'연혁 타임라인 "2017" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-8',name:'연혁 타임라인 "2018" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-9',name:'연혁 타임라인 "2019" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-10',name:'연혁 타임라인 "2020" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-11',name:'연혁 타임라인 "2021" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-12',name:'연혁 타임라인 "2022" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-13',name:'연혁 타임라인 "2023" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-14',name:'연혁 타임라인 "2024" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-15',name:'연혁 타임라인 "2025" 연도 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-16',name:'"케이뱅크 준비법인 설립" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-17',name:'"은행업 본인가 획득" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-18',name:'"케이뱅크 영업개시" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-19',name:'"여수신 합산 1조원 돌파" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-20',name:'"여수신 합산 30조원 돌파" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-21',name:'"첫 연간 흑자 달성(당기순이익 255억)" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-22',name:'"누적 고객 수 1,500만명 돌파" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-23',name:'"기업뱅킹 App 출시" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-24',name:'"App 개편" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-25',name:'"전세대출 출시" 이벤트 표시',tag:'표시',status:'PASS'},
+    {id:'10-26',name:'"국내 최초 비대면 아파트담보대출 출시" 이벤트 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'11',name:'주주사 소개 탭',tests:[
+    {id:'11-1',name:'"주주사 소개" 탭 클릭 시 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'11-2',name:'[Figma 갭 G11] 부제 "케이뱅크는 다양한 분야의 든든한 주주사들과 협력" 표시',tag:'표시',status:'FAIL'},
+    {id:'11-3',name:'카테고리 라벨 "금융" 표시',tag:'표시',status:'PASS'},
+    {id:'11-4',name:'카테고리 라벨 "ICT" 표시',tag:'표시',status:'PASS'},
+    {id:'11-5',name:'[Figma 갭 G14] 카테고리 라벨 "LifeStyle" 표시 (신버전)',tag:'표시',status:'FAIL'},
+    {id:'11-6',name:'금융 주주사 "비씨카드" 표시',tag:'표시',status:'PASS'},
+    {id:'11-7',name:'금융 주주사 "우리은행" 표시',tag:'표시',status:'PASS'},
+    {id:'11-8',name:'금융 주주사 "NH투자증권" 표시',tag:'표시',status:'PASS'},
+    {id:'11-9',name:'금융 주주사 "한화생명" 표시',tag:'표시',status:'PASS'},
+    {id:'11-10',name:'[Figma 갭 G13] 금융 주주사 "iM캐피탈" 표시',tag:'표시',status:'FAIL'},
+    {id:'11-11',name:'[Figma 갭 G13] 금융 주주사 "MDM" 표시',tag:'표시',status:'FAIL'},
+    {id:'11-12',name:'ICT 주주사 "Com2us" 표시',tag:'표시',status:'PASS'},
+    {id:'11-13',name:'ICT 주주사 "KG이니시스" 표시',tag:'표시',status:'PASS'},
+    {id:'11-14',name:'[Figma 갭 G13] ICT 주주사 "Bridgetec" 표시',tag:'표시',status:'FAIL'},
+    {id:'11-15',name:'[Figma 갭 G13] ICT 주주사 "Inzisoft" 표시',tag:'표시',status:'FAIL'},
+    {id:'11-16',name:'[Figma 갭 G14] LifeStyle 주주사 "GS리테일" 표시',tag:'표시',status:'FAIL'},
+    {id:'11-17',name:'[Figma 갭 G14] LifeStyle 주주사 "Smilegate" 표시',tag:'표시',status:'FAIL'},
+  ]},
+  {id:'12',name:'오시는길 탭',tests:[
+    {id:'12-1',name:'"오시는길" 탭 클릭 시 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'12-2',name:'ContactBlock 라벨 "사업 제휴" 표시',tag:'표시',status:'PASS'},
+    {id:'12-3',name:'[Figma 갭 G12] 사업 제휴 이메일 "partnership1@kanknow.com" 표시',tag:'표시',status:'FAIL'},
+    {id:'12-4',name:'ContactBlock 라벨 "케이뱅크 채용 문의" 표시',tag:'표시',status:'PASS'},
+    {id:'12-5',name:'[Figma 갭 G12] 채용 이메일 "recruit@kanknow.com" 표시',tag:'표시',status:'FAIL'},
+    {id:'12-6',name:'본사 소재지 "서울 중구 을지로 170 을지트윈타워" 표시',tag:'표시',status:'PASS'},
+    {id:'12-7',name:'지번 주소 "을지로4가 323" 표시',tag:'표시',status:'PASS'},
+    {id:'12-8',name:'고객센터 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'12-9',name:'고객센터 번호 "1522-1000" 표시',tag:'표시',status:'PASS'},
+    {id:'12-10',name:'SystemBlock 영역 표시',tag:'표시',status:'PASS'},
+  ]},
+];
+
+PAGE_SECTIONS['brand-figma'] = [
+  {id:'1',name:'브랜드 페이지 진입',tests:[
+    {id:'1-1',name:'URL이 /web/about/brand/info를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'role="tablist" 컨테이너 존재',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'<footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'페이지 타이틀 "브랜드" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'탭 네비게이션 (2개)',tests:[
+    {id:'2-1',name:'초기 진입 시 "브랜드 스토리" 탭 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'2개 탭(브랜드 스토리/리소스 센터) 모두 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"리소스 센터" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'2-4',name:'"브랜드 스토리" 복귀 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'3',name:'브랜드 스토리 — Slogan',tests:[
+    {id:'3-1',name:'슬로건/타이틀 영역 표시',tag:'표시',status:'PASS'},
+    {id:'3-2',name:'Slogan 첫 텍스트 "알고 계세요?…" 표시 (자동화 한계로 SKIP)',tag:'표시',status:'SKIP'},
+    {id:'3-3',name:'Slogan 둘째 텍스트 "이제 새로워진 케이뱅크와 함께…" 표시',tag:'표시',status:'PASS'},
+    {id:'3-4',name:'Slogan 셋째 텍스트 "기분좋은 금융생활, Kbank" 표시',tag:'표시',status:'PASS'},
+    {id:'3-5',name:'Slogan 이미지 영역 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'4',name:'브랜드 스토리 — DesignStory',tests:[
+    {id:'4-1',name:'"브랜드 디자인 스토리" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'4-2',name:'안내 본문 "일상 속에서 마주하는 금융의 순간들…" 표시',tag:'표시',status:'PASS'},
+    {id:'4-3',name:'Video Area 영역 렌더링',tag:'표시',status:'PASS'},
+  ]},
+  {id:'5',name:'리소스 센터 탭 진입',tests:[
+    {id:'5-1',name:'"리소스 센터" 탭 클릭 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+    {id:'5-2',name:'URL이 ?tab=resource-center 로 이동',tag:'표시',status:'PASS'},
+  ]},
+  {id:'6',name:'리소스 센터 — Logo',tests:[
+    {id:'6-1',name:'"로고" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'6-2',name:'로고 가이드 본문 표시',tag:'표시',status:'PASS'},
+    {id:'6-3',name:'로고 이미지 영역 표시',tag:'표시',status:'PASS'},
+    {id:'6-4',name:'다운로드 버튼이 1개 이상 표시',tag:'버튼',status:'PASS'},
+  ]},
+  {id:'7',name:'리소스 센터 — Rule(로고 규칙)',tests:[
+    {id:'7-1',name:'"로고규정" 또는 "규정" 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'7-2',name:'본문 "일관된 브랜드 아이덴티티와 명시성을 고려" 표시',tag:'표시',status:'PASS'},
+    {id:'7-3',name:'"여백 확보" 가이드 표시',tag:'표시',status:'PASS'},
+    {id:'7-4',name:'"최소 사이즈" 가이드 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'8',name:'리소스 센터 — Partnership',tests:[
+    {id:'8-1',name:'"파트너십" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'8-2',name:'본문 "케이뱅크 로고를 파트너사 로고와 함께 표기" 표시',tag:'표시',status:'PASS'},
+    {id:'8-3',name:'"로고 비율/최소 여백 확보" 가이드 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'9',name:'리소스 센터 — Guide(브랜드명)',tests:[
+    {id:'9-1',name:'"브랜드명" 또는 "브랜드 네이밍" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'9-2',name:'본문 "케이뱅크의 공식 명칭은 국문 ‘케이뱅크’, 영문 ‘Kbank’" 표시',tag:'표시',status:'PASS'},
+    {id:'9-3',name:'"영문(기본형)" 가이드 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'9-4',name:'"국문" 가이드 라벨 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'10',name:'리소스 센터 — Color',tests:[
+    {id:'10-1',name:'"브랜드 컬러" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'10-2',name:'본문 "Primary Color 사용을 권장" 표시',tag:'표시',status:'PASS'},
+    {id:'10-3',name:'"Primary Color" 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-4',name:'Primary Color 코드 "#0114A7" 표시',tag:'표시',status:'PASS'},
+    {id:'10-5',name:'"Secondary Color" 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'10-6',name:'Secondary Color 코드 "#4262FF" 표시',tag:'표시',status:'PASS'},
+    {id:'10-7',name:'GrayScale 컬러 "#E4E8F0" 표시',tag:'표시',status:'PASS'},
+    {id:'10-8',name:'GrayScale 컬러 "#EFF2F7" 표시',tag:'표시',status:'PASS'},
+    {id:'10-9',name:'GrayScale 컬러 "#F7F8FB" 표시',tag:'표시',status:'PASS'},
+    {id:'10-10',name:'GrayScale 컬러 "#FFFFFF" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'11',name:'리소스 센터 — Color Rule',tests:[
+    {id:'11-1',name:'"컬러 규정" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'11-2',name:'본문 "앱이나 서비스에서 케이뱅크 로고를 사용하는 경우" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'12',name:'리소스 센터 — Icon',tests:[
+    {id:'12-1',name:'"서비스 아이콘" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'12-2',name:'본문 "케이뱅크의 서비스를 나타내는 아이콘" 표시',tag:'표시',status:'PASS'},
+    {id:'12-3',name:'[검토 G16] "사각형" 가이드 라벨 텍스트 (이미지일 수도)',tag:'표시',status:'FAIL'},
+    {id:'12-4',name:'"원형" 가이드 라벨 표시',tag:'표시',status:'PASS'},
+    {id:'12-5',name:'"최소여백" 가이드 라벨 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'13',name:'리소스 센터 — Font',tests:[
+    {id:'13-1',name:'"브랜드 폰트" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'13-2',name:'본문 "지정된 폰트를 사용" 표시',tag:'표시',status:'PASS'},
+    {id:'13-3',name:'폰트명 "Pretendard" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'14',name:'리소스 센터 — Kit (미디어 키트)',tests:[
+    {id:'14-1',name:'"미디어 키트" 섹션 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'14-2',name:'본문 "언론 보도 자료 및 대외 커뮤니케이션 시" 표시',tag:'표시',status:'PASS'},
+    {id:'14-3',name:'미디어 키트 이미지 4개 이상 표시',tag:'표시',status:'PASS'},
+    {id:'14-4',name:'"전체 다운로드" 버튼 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'15',name:'다운로드 버튼',tests:[
+    {id:'15-1',name:'페이지 내 "다운로드" 버튼이 1개 이상 + enabled',tag:'버튼',status:'PASS'},
+    {id:'15-2',name:'"전체 다운로드" 버튼 enabled',tag:'버튼',status:'PASS'},
+  ]},
+];
+PAGE_SECTIONS['ethics-figma'] = [
+  {id:'1',name:'윤리강령 페이지 진입',tests:[
+    {id:'1-1',name:'URL이 /web/about/ethics/info를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'role="tablist" 컨테이너 존재',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'<footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'페이지 타이틀 "윤리강령" 표시',tag:'표시',status:'PASS'},
+    {id:'1-5',name:'히어로 캐치프레이즈 "고객의 이익과 사회적" 표시',tag:'표시',status:'PASS'},
+    {id:'1-6',name:'히어로 캐치프레이즈 "책임을 수행하는 은행" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'탭 네비게이션 (4개)',tests:[
+    {id:'2-1',name:'초기 진입 시 "총칙" 탭 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'4개 탭 모두 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"윤리강령" 탭 클릭 시 aria-selected + URL ?tab=ethics',tag:'콘텐츠',status:'PASS'},
+    {id:'2-4',name:'"행동강령" 탭 클릭 시 aria-selected + URL ?tab=conduct',tag:'콘텐츠',status:'PASS'},
+    {id:'2-5',name:'"준법제도" 탭 클릭 시 aria-selected + URL ?tab=compliance-system',tag:'콘텐츠',status:'PASS'},
+    {id:'2-6',name:'"총칙" 탭 복귀 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'3',name:'총칙 탭',tests:[
+    {id:'3-1',name:'섹션 헤딩 "제1장 총칙" 표시',tag:'표시',status:'PASS'},
+    {id:'3-2',name:'"제1조(목적)" 조항 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'3-3',name:'제1조 본문 "이 윤리강령" 표시',tag:'표시',status:'PASS'},
+    {id:'3-4',name:'제1조 본문 "투명한 윤리경영" 표시',tag:'표시',status:'PASS'},
+    {id:'3-5',name:'제1조 본문 "건전한 신용사회 정착" 표시',tag:'표시',status:'PASS'},
+    {id:'3-6',name:'제1조 본문 "고객보호" 및 "금융산업의 발전" 표시',tag:'표시',status:'PASS'},
+    {id:'3-7',name:'"제2조(적용대상)" 조항 헤딩 표시',tag:'표시',status:'PASS'},
+    {id:'3-8',name:'제2조 본문 "본 강령은 은행에 종사하는" 표시',tag:'표시',status:'PASS'},
+    {id:'3-9',name:'제2조 본문 "잠재적 고객" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'4',name:'윤리강령 탭 — 6개 핵심 강령',tests:[
+    {id:'4-1',name:'"정직과 신뢰" 가치관 표시',tag:'표시',status:'PASS'},
+    {id:'4-2',name:'"신의성실의 원칙" 표시',tag:'표시',status:'PASS'},
+    {id:'4-3',name:'"금융인으로서의 자긍심" 표시',tag:'표시',status:'PASS'},
+    {id:'4-4',name:'"지속적인 성장과 금융산업의 발전" 표시',tag:'표시',status:'PASS'},
+    {id:'4-5',name:'"관련 법령 및 제 규정" 표시',tag:'표시',status:'PASS'},
+    {id:'4-6',name:'"공정하고 자유로운 시장경제" 표시',tag:'표시',status:'PASS'},
+    {id:'4-7',name:'"고객의 입장에서 생각하고" 표시',tag:'표시',status:'PASS'},
+    {id:'4-8',name:'"합리적인 의사결정과 투명한 경영활동" 표시',tag:'표시',status:'PASS'},
+    {id:'4-9',name:'"주주와 기타 이해관계자의 가치를 극대화" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'5',name:'윤리강령 탭 — 책임/의무',tests:[
+    {id:'5-1',name:'"만족하고 신뢰할 수 있는 금융상품" 표시',tag:'표시',status:'PASS'},
+    {id:'5-2',name:'"고객의 자산과 정보" 보호 표시',tag:'표시',status:'PASS'},
+    {id:'5-3',name:'"임직원 개개인의 자율성과 창의성" 표시',tag:'표시',status:'PASS'},
+    {id:'5-4',name:'"차별대우" 금지 조항 표시',tag:'표시',status:'PASS'},
+    {id:'5-5',name:'"윤리교육" 표시',tag:'표시',status:'PASS'},
+    {id:'5-6',name:'"협력업체와 공정한 거래" 표시',tag:'표시',status:'PASS'},
+    {id:'5-7',name:'"적법하고 정당한 기업활동" 표시',tag:'표시',status:'PASS'},
+    {id:'5-8',name:'"환경보호" 표시',tag:'표시',status:'PASS'},
+    {id:'5-9',name:'"사회공헌활동" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'6',name:'행동강령 탭 — 직무/법규/고객보호',tests:[
+    {id:'6-1',name:'"투철한 책임감과 사명감" 표시',tag:'표시',status:'PASS'},
+    {id:'6-2',name:'"지속적인 자기계발" 표시',tag:'표시',status:'PASS'},
+    {id:'6-3',name:'"관련 법규 및 은행 내규" 표시',tag:'표시',status:'PASS'},
+    {id:'6-4',name:'"금융사고 예방" 표시',tag:'표시',status:'PASS'},
+    {id:'6-5',name:'"금융실명제도" 표시',tag:'표시',status:'PASS'},
+    {id:'6-6',name:'"자금세탁" 금지 표시',tag:'표시',status:'PASS'},
+    {id:'6-7',name:'"금융분쟁의 발생" 방지 표시',tag:'표시',status:'PASS'},
+    {id:'6-8',name:'"선량한 관리자의 주의의무" 표시',tag:'표시',status:'PASS'},
+    {id:'6-9',name:'"우월적 지위" 금지 표시',tag:'표시',status:'PASS'},
+    {id:'6-10',name:'"신상정보" 보호 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'7',name:'행동강령 탭 — 이해상충/자산/조직/부패방지',tests:[
+    {id:'7-1',name:'"미공개정보" 금지 표시',tag:'표시',status:'PASS'},
+    {id:'7-2',name:'"금품·향응" 금지 표시',tag:'표시',status:'PASS'},
+    {id:'7-3',name:'"사회통념을 벗어나는 선물" 금지 표시',tag:'표시',status:'PASS'},
+    {id:'7-4',name:'"이해상충" 방지 표시',tag:'표시',status:'PASS'},
+    {id:'7-5',name:'"영리를 목적으로" 표시',tag:'표시',status:'PASS'},
+    {id:'7-6',name:'"지적재산권" 및 "영업비밀" 표시',tag:'표시',status:'PASS'},
+    {id:'7-7',name:'"비공개 정보" 보호 표시',tag:'표시',status:'PASS'},
+    {id:'7-8',name:'"기본적 예의" 표시',tag:'표시',status:'PASS'},
+    {id:'7-9',name:'"성적 수치심" 금지 표시',tag:'표시',status:'PASS'},
+    {id:'7-10',name:'"부정청탁 및 금품등 수수의 금지" 법률 표시',tag:'표시',status:'PASS'},
+    {id:'7-11',name:'"회계장부" 투명 기록 표시',tag:'표시',status:'PASS'},
+    {id:'7-12',name:'"기부" 출연 표시',tag:'표시',status:'PASS'},
+    {id:'7-13',name:'"지체 없이 신고" 의무 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'8',name:'준법제도 탭',tests:[
+    {id:'8-1',name:'"안심하고 신고" 안내문 표시',tag:'표시',status:'PASS'},
+    {id:'8-2',name:'"외부 전문업체" "익명성" 표시',tag:'표시',status:'PASS'},
+    {id:'8-3',name:'제보 대상 ① 금융관계법령상 위반 표시',tag:'표시',status:'PASS'},
+    {id:'8-4',name:'제보 대상 ② 내부통제 관리의무 표시',tag:'표시',status:'PASS'},
+    {id:'8-5',name:'제보 대상 ③ 횡령/배임 등 표시',tag:'표시',status:'PASS'},
+    {id:'8-6',name:'제보 대상 ④ 자점감사 표시',tag:'표시',status:'PASS'},
+    {id:'8-7',name:'제보 대상 ⑤ 내규 및 절차상 준수사항 표시',tag:'표시',status:'PASS'},
+    {id:'8-8',name:'제보 대상 ⑥ 중대한 금융사고 표시',tag:'표시',status:'PASS'},
+    {id:'8-9',name:'제보 대상 ⑦ 다른 임직원으로부터 표시',tag:'표시',status:'PASS'},
+    {id:'8-10',name:'제보 대상 ⑧ 내부회계관리규정 표시',tag:'표시',status:'PASS'},
+    {id:'8-11',name:'제보 대상 ⑨ 기타 위법 표시',tag:'표시',status:'PASS'},
+    {id:'8-12',name:'제보/신고 SolidButton 표시',tag:'버튼',status:'PASS'},
+  ]},
+  {id:'9',name:'푸터',tests:[
+    {id:'9-1',name:'<footer> 표시',tag:'푸터',status:'PASS'},
+    {id:'9-2',name:'푸터 전화번호 3종 표시',tag:'푸터',status:'PASS'},
+    {id:'9-3',name:'인증범위 / 유효기간 표시',tag:'푸터',status:'PASS'},
+  ]},
+];
+PAGE_SECTIONS['notice-figma'] = [
+  {id:'1',name:'공지사항 페이지 진입',tests:[
+    {id:'1-1',name:'URL이 /web/about/notice/list를 포함',tag:'표시',status:'PASS'},
+    {id:'1-2',name:'role="tablist" 컨테이너 존재',tag:'표시',status:'PASS'},
+    {id:'1-3',name:'<footer> 태그 존재',tag:'표시',status:'PASS'},
+    {id:'1-4',name:'페이지 타이틀 "공지사항" 표시',tag:'표시',status:'PASS'},
+    {id:'1-5',name:'히어로 캐치프레이즈 "케이뱅크의 중요 사항을" 표시',tag:'표시',status:'PASS'},
+    {id:'1-6',name:'히어로 캐치프레이즈 "빠르게 안내해드려요" 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'2',name:'탭 네비게이션 (2개)',tests:[
+    {id:'2-1',name:'초기 진입 시 "공지사항" 탭 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'2-2',name:'2개 탭(공지사항/사업공고) 모두 표시',tag:'표시',status:'PASS'},
+    {id:'2-3',name:'"사업공고" 탭 클릭 시 aria-selected=true + URL ?tab=biz-noti',tag:'콘텐츠',status:'PASS'},
+    {id:'2-4',name:'"공지사항" 탭 복귀 시 aria-selected=true',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'3',name:'공지사항 — ChipTab 카테고리 (5개)',tests:[
+    {id:'3-1',name:'ChipTab "전체" 표시',tag:'표시',status:'PASS'},
+    {id:'3-2',name:'ChipTab "상품" 표시',tag:'표시',status:'PASS'},
+    {id:'3-3',name:'ChipTab "카드" 표시',tag:'표시',status:'PASS'},
+    {id:'3-4',name:'ChipTab "서비스" 표시',tag:'표시',status:'PASS'},
+    {id:'3-5',name:'ChipTab "기타" 표시',tag:'표시',status:'PASS'},
+    {id:'3-6',name:'"상품" ChipTab 클릭 시 카테고리 필터 적용',tag:'콘텐츠',status:'PASS'},
+    {id:'3-7',name:'"카드" ChipTab 클릭 시 active 상태',tag:'콘텐츠',status:'PASS'},
+    {id:'3-8',name:'"서비스" ChipTab 클릭',tag:'콘텐츠',status:'PASS'},
+    {id:'3-9',name:'"기타" ChipTab 클릭',tag:'콘텐츠',status:'PASS'},
+    {id:'3-10',name:'"전체" ChipTab 복귀',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'4',name:'공지사항 — Accordion 목록',tests:[
+    {id:'4-1',name:'Accordion 항목 1개 이상 표시',tag:'표시',status:'PASS'},
+    {id:'4-2',name:'"소득공제 증명서 발급안내" 표시',tag:'표시',status:'PASS'},
+    {id:'4-3',name:'날짜 "2025.11.27" 표시',tag:'표시',status:'PASS'},
+    {id:'4-4',name:'"케이뱅크 앱 지원 OS 최소 버전 상향 안내" 표시',tag:'표시',status:'PASS'},
+    {id:'4-5',name:'"해외송금서비스 한도 정책 변경 안내" 표시',tag:'표시',status:'PASS'},
+    {id:'4-6',name:'"더보기" 버튼 표시 + enabled',tag:'버튼',status:'PASS'},
+    {id:'4-7',name:'더보기 옆 페이지 카운트 표시',tag:'표시',status:'PASS'},
+  ]},
+  {id:'5',name:'공지사항 — Accordion 펼침/접힘',tests:[
+    {id:'5-1',name:'초기 Accordion 항목이 aria-expanded=false',tag:'상태',status:'PASS'},
+    {id:'5-2',name:'첫 Accordion 클릭 시 aria-expanded=true',tag:'아코디언',status:'PASS'},
+    {id:'5-3',name:'펼친 Accordion 다시 클릭 시 aria-expanded=false 복원',tag:'아코디언',status:'PASS'},
+    {id:'5-4',name:'펼친 상태에서 본문 노출 확인',tag:'콘텐츠',status:'PASS'},
+  ]},
+  {id:'6',name:'사업공고 — LinkList',tests:[
+    {id:'6-1',name:'"사업공고" 탭 클릭 시 aria-selected=true',tag:'상태',status:'PASS'},
+    {id:'6-2',name:'LinkList 항목 1개 이상 표시',tag:'표시',status:'PASS'},
+    {id:'6-3',name:'"케이뱅크 인증 중개 플랫폼 이용계약 사업자 선정 공고" 표시',tag:'표시',status:'PASS'},
+    {id:'6-4',name:'"[테스트] 케이뱅크 ADW환경 클라우드 전환 및 고도화 사업" 표시',tag:'표시',status:'PASS'},
+    {id:'6-5',name:'"케이뱅크 협업시스템 고도화 사업" 표시',tag:'표시',status:'PASS'},
+    {id:'6-6',name:'"케이뱅크 IT 인프라(스토리지) 운영 유지보수 사업 제안 요청" 표시',tag:'표시',status:'PASS'},
+    {id:'6-7',name:'사업공고 날짜 "2026.03.11" 표시',tag:'표시',status:'PASS'},
+    {id:'6-8',name:'사업공고 날짜 "2025.01.09" 표시',tag:'표시',status:'PASS'},
+    {id:'6-9',name:'사업공고에 ChipTab 미표시 (공지사항과 차별점)',tag:'표시',status:'PASS'},
+  ]},
+  {id:'7',name:'사업공고 — 상세 페이지 이동',tests:[
+    {id:'7-1',name:'첫 사업공고 항목 클릭 시 상세 페이지로 이동',tag:'이동',status:'PASS'},
+    {id:'7-2',name:'상세 페이지에서 본문 텍스트 표시',tag:'표시',status:'PASS'},
+    {id:'7-3',name:'뒤로가기 시 사업공고 목록 페이지로 복원',tag:'복원',status:'PASS'},
+  ]},
+  {id:'8',name:'푸터',tests:[
+    {id:'8-1',name:'<footer> 표시',tag:'푸터',status:'PASS'},
+    {id:'8-2',name:'푸터 전화번호 3종 표시',tag:'푸터',status:'PASS'},
+    {id:'8-3',name:'인증범위 / 유효기간 표시',tag:'푸터',status:'PASS'},
+  ]},
+];
 PAGE_SECTIONS['protected-product'] = [
   {id:'1',name:'페이지 기본 로딩',tests:[
     {id:'1-1',name:'URL이 /web/common/protected-product/info를 포함',tag:'표시',status:'PASS'},
@@ -838,7 +1269,15 @@ function renderPageTabs(){
     var pm=PAGES_META[i];
     var c=countTests(pm.id,pm.hasCommon);
     var cls=i===0?' active':'';
-    html+='<div class="page-tab'+cls+'" onclick="showPage(\''+pm.id+'\')" id="tab-'+pm.id+'">'+pm.name+' <small style="opacity:.6">('+c.total+')</small></div>';
+    // Figma 명세 등록된 페이지: 라이브 + 디자인 합산 카운트
+    var dc=pm.figmaSpec?countTests(pm.figmaSectionsId,pm.hasCommon):null;
+    var totalT=dc?(c.total+dc.total):c.total;
+    var totalFail=dc?(c.fail+dc.fail):c.fail;
+    var totalSkip=dc?(c.skip+dc.skip):c.skip;
+    var failBadge=totalFail>0?' <span style="background:#FEE2E2;color:#991B1B;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-left:4px">'+totalFail+' FAIL</span>':'';
+    var skipBadge=totalSkip>0?' <span style="background:#FEF9C3;color:#854D0E;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-left:4px">'+totalSkip+' SKIP</span>':'';
+    var figmaMark=pm.figmaSpec?' <span style="display:inline-block;width:6px;height:6px;background:#7C3AED;border-radius:50%;margin-left:2px" title="Figma 명세 등록됨"></span>':'';
+    html+='<div class="page-tab'+cls+'" onclick="showPage(\''+pm.id+'\')" id="tab-'+pm.id+'">'+pm.name+'<small style="opacity:.6;margin-left:4px">('+totalT+')</small>'+figmaMark+failBadge+skipBadge+'</div>';
   }
   document.getElementById('page-tabs').innerHTML=html;
 }
@@ -867,7 +1306,9 @@ function renderAccordion(pageId){
       else sf++;
     }
     var secId=pageId+'-'+sec.id;
-    html+='<div class="section-card" id="acc-'+secId+'">'+
+    // FAIL이 있는 섹션은 기본으로 펼침
+    var openCls=sf>0?' open':'';
+    html+='<div class="section-card'+openCls+'" id="acc-'+secId+'">'+
       '<div class="section-head" onclick="toggleSection(\''+secId+'\')">'+
       '<span class="section-title">'+sec.id+'. '+sec.name+'</span>'+
       '<div class="section-meta">';
@@ -906,28 +1347,214 @@ function renderChart(){
   }
   return html+'</div>';
 }
+function renderGapReport(pageId){
+  // Figma 명세 등록된 페이지의 디자인 갭 요약 콜아웃 표시
+  // pageId는 figmaSectionsId (예: 'about-figma') 사용
+  var all=getPageTests(pageId,false);
+  var gaps=[];
+  for(var i=0;i<all.length;i++){
+    if(all[i].status==='FAIL' && all[i].name.indexOf('Figma 갭')>=0){
+      gaps.push(all[i]);
+    }
+    if(all[i].status==='SKIP' && all[i].name.indexOf('Figma 갭 G2')>=0){
+      gaps.push(all[i]);
+    }
+  }
+  if(gaps.length===0)return '';
+  var html='<div style="margin-bottom:18px;padding:18px 22px;background:#FFF7ED;border:2px solid #FB923C;border-radius:10px">';
+  html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">';
+  html+='<span style="font-size:18px">⚠️</span>';
+  html+='<h3 style="font-size:15px;font-weight:700;color:#9A3412;margin:0">디자인 갭 보고서 (디자인팀 컨펌 대상)</h3>';
+  html+='</div>';
+  html+='<p style="font-size:12px;color:#7C2D12;margin-bottom:12px;line-height:1.5">Figma 디자인 명세와 라이브 사이트 구현 사이에서 발견된 차이점입니다. 디자인팀과 컨펌 후 구현 보완 또는 디자인 업데이트가 필요할 수 있습니다.</p>';
+  // 갭별 그룹핑
+  var groups={};
+  for(var g=0;g<gaps.length;g++){
+    var match=gaps[g].name.match(/Figma 갭 (G\d+)/);
+    var key=match?match[1]:'기타';
+    if(!groups[key])groups[key]=[];
+    groups[key].push(gaps[g]);
+  }
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">';
+  var labels={
+    G1:'본문 텍스트 차이 ("생활 속" 추가됨)',
+    G2:'벤다이어그램 라이브 미구현',
+    G5:'활성 GNB 색상 미구분 (#4262ff 적용 안됨)',
+    G8:'탭 그룹 divider 미구현 (1px #eff2f7)',
+    G10:'연혁 부제 1글자 차이 ("금융사업" vs "금융산업")',
+    G11:'🚨 라이브에 오타: "캐이뱅크" (정상: "케이뱅크")',
+    G12:'이메일 도메인 차이 ("kanknow.com" Figma 오타)',
+    G13:'주주사 신버전 미반영 (iM캐피탈/MDM/Bridgetec/Inzisoft)',
+    G14:'주주사 LifeStyle 카테고리 미반영 (GS리테일/Smilegate)',
+    G15:'(취소) Slogan 텍스트 — 라이브 정상 표시 확인 (자동화 한계로 잘못 분류)',
+    G16:'(검토) 사각형 가이드 — 이미지로만 표시되었을 가능성, 시각적 확인 필요',
+  };
+  var keys=Object.keys(groups).sort();
+  for(var k=0;k<keys.length;k++){
+    var key2=keys[k];
+    var statusBadge=groups[key2][0].status==='SKIP'?'<span style="background:#FEF9C3;color:#854D0E;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700">SKIP</span>':'<span style="background:#FEE2E2;color:#991B1B;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700">FAIL</span>';
+    html+='<div style="background:#fff;padding:10px 12px;border-radius:6px;border:1px solid #FED7AA">';
+    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><b style="color:#9A3412;font-size:13px">'+key2+'</b> '+statusBadge+'<span style="color:#7C2D12;font-size:11px">'+groups[key2].length+'건</span></div>';
+    html+='<div style="font-size:12px;color:#1F2937;font-weight:600;margin-bottom:2px">'+(labels[key2]||'')+'</div>';
+    html+='<div style="font-size:11px;color:#64748B">'+groups[key2][0].name.replace(/^\[Figma 갭 G\d+\]\s*/,'').substring(0,60)+'</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='</div>';
+  return html;
+}
+
 function renderAllPages(){
   var html='';
   for(var p=0;p<PAGES_META.length;p++){
     var pm=PAGES_META[p];var cls=p===0?' active':'';var c=countTests(pm.id,pm.hasCommon);
-    html+='<div class="page-panel'+cls+'" id="panel-'+pm.id+'">'+
+    var hasFigma=!!pm.figmaSpec;
+    var figmaLink=pm.figma?'<a href="'+pm.figma+'" target="_blank" style="color:#7C3AED;font-size:12px;font-weight:600;text-decoration:none;background:#F5F3FF;padding:4px 10px;border-radius:6px;border:1px solid #DDD6FE">🎨 Figma 보기 ↗</a>':'';
+
+    // 디자인 모드용 데이터 (figmaSectionsId 기반)
+    var dc=hasFigma?countTests(pm.figmaSectionsId,pm.hasCommon):null;
+    var combinedTotal=hasFigma?(c.total+dc.total):c.total;
+    var combinedPass=hasFigma?(c.pass+dc.pass):c.pass;
+    var combinedFail=hasFigma?(c.fail+dc.fail):c.fail;
+    var combinedSkip=hasFigma?(c.skip+dc.skip):c.skip;
+
+    html+='<div class="page-panel'+cls+'" id="panel-'+pm.id+'" data-has-figma="'+hasFigma+'" data-figma-id="'+(pm.figmaSectionsId||'')+'">'+
+      // 페이지 메타 바
       '<div style="margin-bottom:14px;padding:10px 14px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">'+
-      '<span style="color:#64748B;font-size:12px">스펙: <b style="color:#1E3A5F">'+pm.spec+'</b></span>'+
+      '<span style="color:#64748B;font-size:12px">스펙: <b style="color:#1E3A5F" id="meta-spec-'+pm.id+'">'+pm.spec+'</b></span>'+
       '<span style="color:#64748B;font-size:12px">최종 실행: <b style="color:#1E3A5F">'+pm.lastRun+'</b></span>'+
-      '<span class="badge pass" style="font-size:12px">'+c.pass+' PASS</span>'+
-      (c.fail>0?'<span class="badge fail" style="font-size:12px">'+c.fail+' FAIL</span>':'')+
-      (c.skip>0?'<span class="badge" style="font-size:12px;background:#FEF9C3;color:#854D0E">'+c.skip+' SKIP</span>':'')+
-      '</div>'+
-      '<div class="sub-tabs">'+
+      '<span class="badge pass" style="font-size:12px" id="badge-pass-'+pm.id+'">'+c.pass+' PASS</span>'+
+      '<span class="badge fail" style="font-size:12px;display:'+(c.fail>0?'inline-block':'none')+'" id="badge-fail-'+pm.id+'">'+c.fail+' FAIL</span>'+
+      '<span class="badge" style="font-size:12px;background:#FEF9C3;color:#854D0E;display:'+(c.skip>0?'inline-block':'none')+'" id="badge-skip-'+pm.id+'">'+c.skip+' SKIP</span>'+
+      figmaLink+
+      '</div>';
+
+    // 검증 모드 토글 (Figma 명세 등록된 페이지만)
+    if(hasFigma){
+      // figmaOnly 페이지는 라이브 spec 없음 → 디자인 모드 디폴트, 라이브 버튼 비활성
+      var isFigmaOnly=!!pm.figmaOnly;
+      var liveBtnState=isFigmaOnly?' disabled style="opacity:.4;cursor:not-allowed"':'';
+      var liveActive=isFigmaOnly?'':' active';
+      var designActive=isFigmaOnly?' active':'';
+      html+='<div class="mode-toggle" id="mt-'+pm.id+'">'+
+        '<span class="mode-toggle-label">검증 모드</span>'+
+        '<div class="mode-toggle-group">'+
+        '<button class="mode-toggle-btn'+liveActive+'" id="mode-'+pm.id+'-live" onclick="setMode(\''+pm.id+'\',\'live\')"'+liveBtnState+' title="'+(isFigmaOnly?'라이브 spec 미작성':'')+'"><span class="ico">⚡</span>라이브 검증</button>'+
+        '<button class="mode-toggle-btn design'+designActive+'" id="mode-'+pm.id+'-design" onclick="setMode(\''+pm.id+'\',\'design\')"><span class="ico">🎨</span>디자인 명세</button>'+
+        '<button class="mode-toggle-btn combined" id="mode-'+pm.id+'-combined" onclick="setMode(\''+pm.id+'\',\'combined\')"'+(isFigmaOnly?' disabled style="opacity:.4;cursor:not-allowed"':'')+'><span class="ico">⚏</span>통합 보기</button>'+
+        '</div>'+
+        '<span class="mode-toggle-info" id="mode-info-'+pm.id+'">'+(isFigmaOnly?'<b>디자인 모드</b>: Figma 디자인 명세 기반 검증 ('+dc.total+' 케이스). 라이브 spec 미작성됨.':'<b>라이브 모드</b>: 실제 운영 중인 사이트 콘텐츠 검증 ('+c.total+' 케이스, '+c.pass+' PASS)')+'</span>'+
+        '</div>';
+    }
+
+    // 디자인 갭 보고서 (디자인 모드에서만 표시)
+    // figmaOnly 페이지는 처음부터 디자인 모드이므로 즉시 표시
+    if(hasFigma){
+      var gapInitDisplay=pm.figmaOnly?'block':'none';
+      html+='<div id="gap-wrap-'+pm.id+'" style="display:'+gapInitDisplay+'">'+renderGapReport(pm.figmaSectionsId)+'</div>';
+    }
+
+    // sub tabs
+    html+='<div class="sub-tabs">'+
       '<div class="sub-tab active" onclick="showSubTab(\''+pm.id+'\',\'result\')" id="sub-'+pm.id+'-result">테스트 결과</div>'+
-      '<div class="sub-tab" onclick="showSubTab(\''+pm.id+'\',\'cases\')" id="sub-'+pm.id+'-cases">테스트 케이스 ('+c.total+')</div>'+
-      '</div>'+
-      '<div class="sub-panel active" id="subp-'+pm.id+'-result">'+renderAccordion(pm.id)+'</div>'+
+      '<div class="sub-tab" onclick="showSubTab(\''+pm.id+'\',\'cases\')" id="sub-'+pm.id+'-cases">테스트 케이스 (<span id="case-count-'+pm.id+'">'+c.total+'</span>)</div>'+
+      '</div>';
+
+    // 라이브 결과 / 디자인 결과 / 통합 — figmaOnly면 디자인이 디폴트
+    var isFigmaOnlyForContent=hasFigma&&pm.figmaOnly;
+    var liveDisplay=isFigmaOnlyForContent?'none':'block';
+    var designDisplay=isFigmaOnlyForContent?'block':'none';
+    html+='<div class="sub-panel active" id="subp-'+pm.id+'-result">'+
+      '<div id="content-'+pm.id+'-live" style="display:'+liveDisplay+'">'+(isFigmaOnlyForContent?'<div style="padding:30px;text-align:center;color:#94A3B8;font-size:13px">라이브 검증 spec이 아직 작성되지 않았습니다.</div>':renderAccordion(pm.id))+'</div>';
+
+    // 디자인 결과 (Figma 명세 페이지만)
+    if(hasFigma){
+      html+='<div id="content-'+pm.id+'-design" style="display:'+designDisplay+'">'+renderAccordion(pm.figmaSectionsId)+'</div>';
+      html+='<div id="content-'+pm.id+'-combined" style="display:none">'+
+        '<div style="background:#E0F2FE;border:1px solid #0E7490;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0E7490"><b>⚏ 통합 보기:</b> 라이브 검증 결과('+c.total+' 케이스) + 디자인 명세 검증 결과('+dc.total+' 케이스). 각 출처는 섹션 타이틀로 구분됩니다.</div>'+
+        '<h4 style="font-size:13px;color:#1E40AF;margin:18px 0 8px;display:flex;align-items:center;gap:6px"><span style="background:#DBEAFE;color:#1E40AF;padding:2px 8px;border-radius:4px;font-size:11px">⚡ 라이브</span> 라이브 검증 결과</h4>'+
+        (isFigmaOnlyForContent?'<div style="color:#94A3B8;font-size:12px;padding:12px">라이브 spec 미작성</div>':renderAccordion(pm.id))+
+        '<h4 style="font-size:13px;color:#7C3AED;margin:18px 0 8px;display:flex;align-items:center;gap:6px"><span style="background:#F5F3FF;color:#7C3AED;padding:2px 8px;border-radius:4px;font-size:11px">🎨 디자인</span> 디자인 명세 검증 결과</h4>'+
+        renderAccordion(pm.figmaSectionsId)+
+        '</div>';
+    }
+
+    html+='</div>'+
       '<div class="sub-panel" id="subp-'+pm.id+'-cases">'+renderTable(pm.id)+'</div>'+
       '</div>';
   }
   html+=renderChart();
   document.getElementById('content-area').innerHTML=html;
+}
+
+// 검증 모드 전환 함수 (옵션 A)
+function setMode(pageId, mode){
+  var pm=null;
+  for(var i=0;i<PAGES_META.length;i++)if(PAGES_META[i].id===pageId)pm=PAGES_META[i];
+  if(!pm||!pm.figmaSpec)return;
+
+  // 토글 버튼 활성화 갱신
+  var modes=['live','design','combined'];
+  for(var m=0;m<modes.length;m++){
+    var btn=document.getElementById('mode-'+pageId+'-'+modes[m]);
+    if(btn)btn.classList.toggle('active', modes[m]===mode);
+  }
+
+  // 콘텐츠 섹션 전환
+  for(var m2=0;m2<modes.length;m2++){
+    var ct=document.getElementById('content-'+pageId+'-'+modes[m2]);
+    if(ct)ct.style.display=(modes[m2]===mode?'block':'none');
+  }
+
+  // 갭 보고서: 디자인 모드에서만 표시
+  var gapWrap=document.getElementById('gap-wrap-'+pageId);
+  if(gapWrap)gapWrap.style.display=(mode==='design'?'block':'none');
+
+  // 카운트 갱신
+  var liveC=countTests(pageId, pm.hasCommon);
+  var designC=countTests(pm.figmaSectionsId, pm.hasCommon);
+  var modeMeta={
+    'live':{total:liveC.total,pass:liveC.pass,fail:liveC.fail,skip:liveC.skip,
+            info:'<b>라이브 모드</b>: 실제 운영 중인 사이트 콘텐츠 검증 ('+liveC.total+' 케이스, '+liveC.pass+' PASS)',
+            spec:pm.spec},
+    'design':{total:designC.total,pass:designC.pass,fail:designC.fail,skip:designC.skip,
+              info:'<b>디자인 모드</b>: Figma 디자인 명세 기반 검증 ('+designC.total+' 케이스, '+designC.pass+' PASS / '+designC.fail+' FAIL / '+designC.skip+' SKIP) — 디자인 갭 발견 시 FAIL 표시',
+              spec:pm.figmaSpec},
+    'combined':{total:liveC.total+designC.total,pass:liveC.pass+designC.pass,fail:liveC.fail+designC.fail,skip:liveC.skip+designC.skip,
+                info:'<b>통합 모드</b>: 라이브 + 디자인 검증 합산 ('+(liveC.total+designC.total)+' 케이스)',
+                spec:pm.spec+' + '+pm.figmaSpec}
+  };
+  var u=modeMeta[mode];
+
+  // 모드 정보 텍스트 갱신
+  var info=document.getElementById('mode-info-'+pageId);
+  if(info)info.innerHTML=u.info;
+
+  // 페이지 메타 바 갱신
+  var specEl=document.getElementById('meta-spec-'+pageId);
+  if(specEl)specEl.textContent=u.spec;
+  var passBadge=document.getElementById('badge-pass-'+pageId);
+  if(passBadge)passBadge.textContent=u.pass+' PASS';
+  var failBadge=document.getElementById('badge-fail-'+pageId);
+  if(failBadge){
+    failBadge.textContent=u.fail+' FAIL';
+    failBadge.style.display=(u.fail>0?'inline-block':'none');
+  }
+  var skipBadge=document.getElementById('badge-skip-'+pageId);
+  if(skipBadge){
+    skipBadge.textContent=u.skip+' SKIP';
+    skipBadge.style.display=(u.skip>0?'inline-block':'none');
+  }
+  var caseCount=document.getElementById('case-count-'+pageId);
+  if(caseCount)caseCount.textContent=u.total;
+
+  // 상단 stat-card 동기화
+  updateSummaryForMode(pageId, mode, modeMeta);
+}
+
+function updateSummaryForMode(pageId, mode, modeMeta){
+  // 페이지 단위 stat-card는 전체 합산 유지하되, 현재 페이지의 검증 모드 정보를 우상단에 작은 안내로 추가하지 않음.
+  // (현재는 stat-card는 전체 페이지 합산 유지)
 }
 function showPage(id){
   var panels=document.querySelectorAll('.page-panel');
